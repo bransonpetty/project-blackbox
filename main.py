@@ -5,11 +5,11 @@ Future boilerplate
 class Simulator:
     '''Holds the list of commands and simulator functions'''
     def __init__(self):
-        self.registers = {}
-        self.accumulator = "0000"
-        self.instructions = ["10", "11", "20", "21", "30", "31", "32", "33", "40", "41", "42", "43"]
+        self.registers = {} #Initializes the registers
+        self.accumulator = "0000" #Initializes the accumulator
+        self.instructions = ["10", "11", "20", "21", "30", "31", "32", "33", "40", "41", "42", "43"] #Lists all the valid instructions
 
-        for i in range(100):
+        for i in range(100): #Creates the registers using a dictionary
             self.registers[i] = "0000"
 
     def open_file(self, file_name):
