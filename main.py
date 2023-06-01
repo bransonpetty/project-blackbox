@@ -8,7 +8,7 @@ class Simulator:
         self.registers = {};
 
         for i in range(100):
-            self.registers[i] = 0;
+            self.registers[i] = "0000";
 
     def open_file(self, file_name):
         try:
