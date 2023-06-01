@@ -30,7 +30,9 @@ class Simulator:
 
 def main():
     '''Main function'''
-    print("Hello World!")
+    insta = Simulator()
+    insta.open_file('file1.txt')
+    print(insta.registers)
 
 if __name__ == "__main__":
     main()
