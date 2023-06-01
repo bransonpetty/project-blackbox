@@ -2,33 +2,38 @@
 Future boilerplate
 '''
 
+import os
+
+
 class Simulator:
     '''Holds the list of commands and simulator functions'''
     def __init__(self):
         self.registers = {} #Initializes the registers
-        self.accumulator = "0000" #Initializes the accumulator
+        self.accumulator = "+0000" #Initializes the accumulator
         self.instructions = ["10", "11", "20", "21", "30", "31", "32", "33", "40", "41", "42", "43"] #Lists all the valid instructions
         self.log = [] #Creates a log list of all the operations
 
         for i in range(100): #Creates the registers using a dictionary
-            self.registers[i] = "0000"
+            self.registers[i] = "+0000"
 
     def open_file(self, file_name):
-        try:
+        if os.path.exists(file_name):
             with open(file_name) as input_file:
                 addr = 0 
                 for line in input_file:
                     line = line.strip()
                     #make sure its a + or a -
-                    if line[0] == '+' or line[0] == '-':
-                        opcode = line[1:3]       #10
-                        complete_code = line[1:] #1007
-                        if len(complete_code) == 4: #CHECKS TO SEE IF THE TOTAL CODE IS LENGTH OF 4 (EX. 1007)
-                            source = line[3:] #07
-                            self.registers[addr] = complete_code
-                            addr += 1
+                    if len(line) == 5:
+                        self.registers[addr] = line
+                    elif line == "-99999":
+                        return True
+                    else:
+                        print(f"Invalid line in file: {line}")
+                        return False
+                    addr += 1
             return True
-        except:
+        else:
+            print("File does not exist")
             return False
         
     def run(self):
@@ -36,7 +41,7 @@ class Simulator:
         curr_addr = 0 #The current address in the simulator
         choice = True #Stops while loop if user aborts or halts
         while curr_addr < 100 and choice:
-            choice = self.controller(self.registers[curr_addr][:2], self.registers[curr_addr][:-2]) #Sends instruction code and address to controller
+            choice = self.controller(self.registers[curr_addr][1:3], self.registers[curr_addr][1:-3]) #Sends instruction code and address to controller
             curr_addr += 1 #Moves to next address
         return
     
@@ -156,7 +161,7 @@ class Simulator:
             
             reg_end = 99
             for i in reversed(range(100)):
-                if self.registers[i] != "0000":
+                if self.registers[i] != "+0000":
                     reg_end = i
                     break
             
