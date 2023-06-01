@@ -11,13 +11,17 @@ class Simulator:
     def __init__(self):
         self.registers = {} #Initializes the registers
         self.accumulator = "+0000" #Initializes the accumulator
+        self.cur_addr = 0 #Initializes the current address
         self.instructions = ["10", "11", "20", "21", "30", "31", "32", "33", "40", "41", "42", "43"] #Lists all the valid instructions
         self.log = [] #Creates a log list of all the operations
 
         for i in range(100): #Creates the registers using a dictionary
             self.registers[i] = "+0000"
 
+    '''Class management functions'''
+
     def open_file(self, file_name):
+        '''Opens a file and loads the contents into the registers'''
         if os.path.exists(file_name):
             with open(file_name) as input_file:
                 addr = 0 
@@ -39,11 +43,10 @@ class Simulator:
         
     def run(self):
         '''Runs each line of the simulator and calls the controller for the appropriate instructions'''
-        curr_addr = 0 #The current address in the simulator
         choice = True #Stops while loop if user aborts or halts
-        while curr_addr < 100 and choice:
-            choice = self.controller(self.registers[curr_addr][1:3], self.registers[curr_addr][1:-3]) #Sends instruction code and address to controller
-            curr_addr += 1 #Moves to next address
+        while self.cur_addr < 100 and choice:
+            choice = self.controller(self.registers[self.cur_addr][1:3], self.registers[self.cur_addr][1:-3]) #Sends instruction code and address to controller
+            self.cur_addr += 1 #Moves to next address
         return
     
     def controller(self, instruction, addr):
@@ -78,6 +81,29 @@ class Simulator:
 
         return True
     
+    def report(self, report_num):
+        '''Reports a log of operations and all of the instructions present in the registers and accumulator.'''
+        with open(f"Report({report_num}).txt", "w") as report_file: #Creates a new file for the report
+            report_file.write("PROGRAM REPORT:\n\n")
+            report_file.write("Log of operations performed:\n\n") #Writes the log of operations to the file
+            for op in self.log:
+                report_file.write(f"{op}\n")
+            
+            reg_end = 99
+            for i in reversed(range(100)): #Finds the last register that was used
+                if self.registers[i] != "+0000":
+                    reg_end = i
+                    break
+            
+            report_file.write("\nFinal state of the registry:\n\n") 
+            for i in range(reg_end + 1): #Writes the final state of the registers to the file
+                report_file.write(f"{str(i).zfill(2)}: {self.registers[i]}\n")
+
+            report_file.write(f"\nFinal value of the accumulator: {self.accumulator}\n") #Writes the final value of the accumulator to the file
+        return
+    
+    '''I/O operations'''
+    
     def read(self, addr):
         '''Reads a word from the keyboard into a specific location in memory.'''
         self.log.append(f"Word was read from keyboard into address: {addr}")
@@ -90,6 +116,8 @@ class Simulator:
         print("write")
         return
     
+    '''Load/store operations'''
+    
     def load(self, addr):
         '''Loads a word from a specific location in memory into the accumulator.'''
         self.log.append(f"Word was loaded to the accumulator from address: {addr}")
@@ -101,6 +129,8 @@ class Simulator:
         self.log.append(f"Word was stored from the accumulator into address: {addr}")
         print("store")
         return
+    
+    '''Arithmetic operations'''
     
     def add(self, addr):
         '''Adds a word from a specific location in memory to the word in the accumulator (leaves the result in the accumulator)'''
@@ -126,6 +156,8 @@ class Simulator:
         print("multiply")
         return
     
+    '''Control operations'''
+
     def branch(self, addr):
         '''Branches to a specific location in memory.'''
         self.log.append(f"Program branched to address: {addr}")
@@ -152,27 +184,6 @@ class Simulator:
         print("halt")
         return False
     
-    def report(self, report_num):
-        '''Reports a log of operations and all of the instructions present in the registers and accumulator.'''
-        with open(f"Report({report_num}).txt", "w") as report_file: #Creates a new file for the report
-            report_file.write("PROGRAM REPORT:\n\n")
-            report_file.write("Log of operations performed:\n\n") #Writes the log of operations to the file
-            for op in self.log:
-                report_file.write(f"{op}\n")
-            
-            reg_end = 99
-            for i in reversed(range(100)): #Finds the last register that was used
-                if self.registers[i] != "+0000":
-                    reg_end = i
-                    break
-            
-            report_file.write("\nFinal state of the registry:\n\n") 
-            for i in range(reg_end + 1): #Writes the final state of the registers to the file
-                report_file.write(f"{str(i).zfill(2)}: {self.registers[i]}\n")
-
-            report_file.write(f"\nFinal value of the accumulator: {self.accumulator}\n") #Writes the final value of the accumulator to the file
-        return
-    
 def invalid_instruction(instruction):
     '''If the instruction is invalid, it asks the user if they want to continue from the next instruction or end the program'''
     print(f"{instruction} is an invalid instruction")
@@ -186,6 +197,7 @@ def invalid_instruction(instruction):
             print("Invalid input, try again.")
 
 def simulator_run(file_name, report_num):
+    '''Runs all functions required from the simulator'''
     insta = Simulator() #Creates a new instance of the simulator
     success = False
     while not success: #Checks if file exists, and opens it. If it doesn't exist, it asks for a new file name.
