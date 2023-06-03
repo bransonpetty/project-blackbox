@@ -106,13 +106,13 @@ class Simulator:
     
     def read(self, addr):
         '''Reads a word from the keyboard into a specific location in memory.'''
-        self.log.append(f"Word was read from keyboard into address: {addr}")
+        self.log.append(f"Word was read from keyboard into address: {str(addr).zfill(2)}")
         print("read")
         return
     
     def write(self, addr):
         '''Writes a word from a specific location in memory to screen.'''
-        self.log.append(f"Word was written to screen from address: {addr}")
+        self.log.append(f"Word was written to screen from address: {str(addr).zfill(2)}")
         print("write")
         return
     
@@ -120,13 +120,13 @@ class Simulator:
     
     def load(self, addr):
         '''Loads a word from a specific location in memory into the accumulator.'''
-        self.log.append(f"Word was loaded to the accumulator from address: {addr}")
+        self.log.append(f"Word was loaded to the accumulator from address: {str(addr).zfill(2)}")
         print("load")
         return
     
     def store(self, addr):
         '''Stores a word from the accumulator into a specific location in memory.'''
-        self.log.append(f"Word was stored from the accumulator into address: {addr}")
+        self.log.append(f"Word was stored from the accumulator into address: {str(addr).zfill(2)}")
         print("store")
         return
     
@@ -134,25 +134,25 @@ class Simulator:
     
     def add(self, addr):
         '''Adds a word from a specific location in memory to the word in the accumulator (leaves the result in the accumulator)'''
-        self.log.append(f"The word in the accumulator was added to the word in address: {addr} and stored back in the accumulator")
+        self.log.append(f"The word in the accumulator was added to the word in address: {str(addr).zfill(2)} and stored back in the accumulator")
         print("add")
         return
     
     def subtract(self, addr):
         '''Subtracts a word from a specific location in memory from the word in the accumulator (leaves the result in the accumulator)'''
-        self.log.append(f"The word in the accumulator was subtracted with the word in address: {addr} and stored back in the accumulator")
+        self.log.append(f"The word in the accumulator was subtracted with the word in address: {str(addr).zfill(2)} and stored back in the accumulator")
         print("subtract")
         return
     
     def divide(self, addr):
         '''Divides the word in the accumulator by a word from a specific location in memory (leaves the result in the accumulator).'''
-        self.log.append(f"The word in the accumulator was divided by the word in address: {addr} and stored back in the accumulator")
+        self.log.append(f"The word in the accumulator was divided by the word in address: {str(addr).zfill(2)} and stored back in the accumulator")
         print("divide")
         return
     
     def multiply(self, addr):
         '''Multiplies a word from a specific location in memory to the word in the accumulator (leaves the result in the accumulator).'''
-        self.log.append(f"The word in the accumulator was multiplied by the word in address: {addr} and stored back in the accumulator")
+        self.log.append(f"The word in the accumulator was multiplied by the word in address: {str(addr).zfill(2)} and stored back in the accumulator")
         print("multiply")
         return
     
@@ -160,21 +160,21 @@ class Simulator:
 
     def branch(self, addr):
         '''Branches to a specific location in memory.'''
-        self.log.append(f"Program branched to address: {addr}")
+        self.log.append(f"Program branched to address: {str(addr).zfill(2)}")
         print("branch")
         return
     
     def branch_neg(self, addr):
         '''Branches to a specific location in memory if the accumulator is negative.'''
         if int(self.accumulator) < 0:
-            self.log.append(f"Program branched to address: {addr} since the accumulator was negative({self.accumulator})")
+            self.log.append(f"Program branched to address: {str(addr).zfill(2)} since the accumulator was negative({self.accumulator})")
         print("branch_neg")
         return
     
     def branch_zero(self, addr):
         '''Branches to a specific location in memory if the accumulator is zero.'''
         if int(self.accumulator) == "0000":
-            self.log.append(f"Program branched to address: {addr} since the accumulator was zero({self.accumulator})")
+            self.log.append(f"Program branched to address: {str(addr).zfill(2)} since the accumulator was zero({self.accumulator})")
         print("branch_zero")
         return
     
