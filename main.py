@@ -113,9 +113,8 @@ class Simulator:
     def read(self, addr):
         '''Reads a word from the keyboard into a specific location in memory.'''
         self.log.append(f"Word was read from keyboard into address: {str(addr).zfill(2)}")
-        print(f'ADDRESS IS {addr}')
         addr = int(addr)
-        user_input = input('Enter a 4 digit number into memory: ')
+        user_input = input(f'Enter a positive or negative 4 digit number into memory register {addr}: ')
         self.registers[addr] = user_input
         print(f'REGISTERS ARE {self.registers}')
         return
@@ -123,7 +122,6 @@ class Simulator:
     def write(self, addr):
         '''Writes a word from a specific location in memory to screen.'''
         self.log.append(f"Word was written to screen from address: {str(addr).zfill(2)}")
-        print(f'Address is {addr}')
         addr = int(addr)
         print(f'TO SCREEN: {self.registers[addr]}')
         return
