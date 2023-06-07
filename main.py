@@ -58,6 +58,8 @@ class Simulator:
         if instruction not in self.instructions: #If it's not a valid instruction, it either ends the program or continues from the next instruction
             choice = invalid_instruction(instruction)
             return choice
+        elif instruction == "00":
+            return True
         elif instruction == "10":
             self.read(addr)
         elif instruction == "11":
@@ -112,7 +114,6 @@ class Simulator:
         '''Reads a word from the keyboard into a specific location in memory.'''
         self.log.append(f"Word was read from keyboard into address: {str(addr).zfill(2)}")
         print(f'ADDRESS IS {addr}')
-        print("read")
         addr = int(addr)
         user_input = input('Enter a 4 digit number into memory: ')
         self.registers[addr] = user_input
@@ -123,7 +124,6 @@ class Simulator:
         '''Writes a word from a specific location in memory to screen.'''
         self.log.append(f"Word was written to screen from address: {str(addr).zfill(2)}")
         print(f'Address is {addr}')
-        print("write")
         addr = int(addr)
         print(f'TO SCREEN: {self.registers[addr]}')
         return
@@ -134,7 +134,6 @@ class Simulator:
         '''Loads a word from a specific location in memory into the accumulator.'''
         self.log.append(f"Word was loaded to the accumulator from address: {str(addr).zfill(2)}")
         print(f'addr is {addr}')
-        print("load")
         addr = int(addr)
         self.accumulator = self.registers[addr]
         print(f'accumulator is now {self.accumulator}')
@@ -144,7 +143,6 @@ class Simulator:
         '''Stores a word from the accumulator into a specific location in memory.'''
         self.log.append(f"Word was stored from the accumulator into address: {str(addr).zfill(2)}")
         print(f'addr is {addr}')
-        print("store")
         addr = int(addr)
         self.registers[addr] = self.accumulator
         print(f'accumulator is now {self.accumulator}')
@@ -181,21 +179,21 @@ class Simulator:
     def branch(self, addr):
         '''Branches to a specific location in memory.'''
         self.log.append(f"Program branched to address: {str(addr).zfill(2)}")
-        print("branch")
+        self.cur_addr = int(addr) - 1
         return
     
     def branch_neg(self, addr):
         '''Branches to a specific location in memory if the accumulator is negative.'''
-        if int(self.accumulator) < 0:
+        if int(int(self.accumulator)) < 0:
             self.log.append(f"Program branched to address: {str(addr).zfill(2)} since the accumulator was negative({self.accumulator})")
-        print("branch_neg")
+            self.cur_addr = int(addr) - 1
         return
     
     def branch_zero(self, addr):
         '''Branches to a specific location in memory if the accumulator is zero.'''
-        if int(self.accumulator) == "0000":
+        if int(self.accumulator) == "+0000":
             self.log.append(f"Program branched to address: {str(addr).zfill(2)} since the accumulator was zero({self.accumulator})")
-        print("branch_zero")
+            self.cur_addr = int(addr) - 1
         return
     
     def halt(self):
@@ -223,19 +221,29 @@ def simulator_run(file_name, report_num):
     while not success: #Checks if file exists, and opens it. If it doesn't exist, it asks for a new file name.
         success = insta.open_file(file_name)
         if not success:
-            file_name = input("Enter the name of the file: ")
+            file_name = input("Enter the name of the file or type 'cancel' to abort the program: ")
+        if file_name.lower() == "cancel":
+            print("This operation was cancelled. Have a nice day!")
+            return False
     insta.run() #Runs the simulator
     insta.report(report_num) #Creates a report of the simulator run
+    return True
 
 
 def main():
     '''Main function'''
     report_num = 1 #Keep track of the number of reports so we don't overwrite previous reports
     if len(argv) < 2: #Checks if the user entered a file name, if not, it asks for one.
-        file_name = input("Enter the name of the file: ")
+        file_name = input("Enter the name of the file or type 'cancel' to abort the program: ")
+        if file_name.lower() == "cancel":
+            print("This operation was cancelled. Have a nice day!")
+            return
     else:
         file_name = argv[1]
-    simulator_run(file_name, report_num) #Runs the first simulator instance
+    simu_ran = simulator_run(file_name, report_num) #Runs the first simulator instance
+
+    if not simu_ran: #If the user cancelled the program, it ends the program.
+        return
 
     #This part of the code asks the user if they want to run the simulator again for another file, if not, it ends the program.
     again = True
