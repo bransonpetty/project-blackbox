@@ -1,5 +1,24 @@
 '''
-Future boilerplate
+OPERATION CODES FOR THE PROGRAM:
+I/O operations:
+READ = 10 Read a word from the keyboard into a specific location in memory.
+WRITE = 11 Write a word from a specific location in memory to screen.
+
+Load/store operations:
+LOAD = 20 Load a word from a specific location in memory into the accumulator.
+STORE = 21 Store a word from the accumulator into a specific location in memory.
+
+Arithmetic operations:
+ADD = 30 Add a word from a specific location in memory to the word in the accumulator (leave the result in the accumulator)
+SUBTRACT = 31 Subtract a word from a specific location in memory from the word in the accumulator (leave the result in the accumulator)
+DIVIDE = 32 Divide the word in the accumulator by a word from a specific location in memory (leave the result in the accumulator).
+MULTIPLY = 33 multiply a word from a specific location in memory to the word in the accumulator (leave the result in the accumulator).
+
+Control operatios:
+BRANCH = 40 Branch to a specific location in memory
+BRANCHNEG = 41 Branch to a specific location in memory if the accumulator is negative.
+BRANCHZERO = 42 Branch to a specific location in memory if the accumulator is zero.
+HALT = 43 Pause the program
 '''
 
 import os
@@ -56,7 +75,7 @@ class Simulator:
     
     def controller(self, instruction, addr):
         '''It directs the simulator along with the desired address to the appropriate function based on the instruction'''
-        choice = True
+        choice = True #True or false is returned by every function and stored in "choice" variable in order to determine if the program should continue or not.
         if instruction not in self.instructions: #If it's not a valid instruction, it either ends the program or continues from the next instruction
             choice = self.invalid_instruction(instruction)
         elif instruction == "00":
@@ -97,7 +116,7 @@ class Simulator:
                 report_file.write(f"{op}\n")
             
             reg_end = 99
-            for i in reversed(range(100)): #Finds the last register that was used
+            for i in reversed(range(100)): #Finds the last register that was used so we don't write all 100 registers to the file.
                 if self.registers[i] != "+0000":
                     reg_end = i
                     break
@@ -112,7 +131,7 @@ class Simulator:
     def invalid_instruction(self, instruction):
         '''If the instruction is invalid, it asks the user if they want to continue from the next instruction or end the program'''
         print(f"{instruction} is an invalid instruction")
-        while True:
+        while True: #Loops until a valid instruction is reached or the user decides to finish the program.
             choice = input("Would you like to continue from the next instruction? (y/n): ").lower()
             if choice == "y":
                 return True
@@ -124,24 +143,24 @@ class Simulator:
     def format_input(self, user_input):
         '''Validates the input for the address'''
         try:
-            if user_input[0] == "-" or user_input[0] == "+":
-                if len(user_input) == 5:
-                    user_int = int(user_input)
-                    return user_input
+            if user_input[0] == "-" or user_input[0] == "+": #It first checks if a operation sign is present.
+                if len(user_input) == 5: #If it is, it checks if the number is 4 digits long.
+                    user_int = int(user_input) #If it can't parse, it's not a number. A ValueError is raised.
+                    return user_input #If it parses successfully, it returns the input as is.
                 else:
                     print("Invalid input. Please enter a valid positive or negative 4 digit number.")
-                    return '-1'
-            elif user_input == "0000":
+                    return '-1' #-1 is the error code for an invalid input
+            elif user_input == "0000": #If 0000 is entered without a sign, we return it with the + sign..
                 return "+0000"
             elif len(user_input) == 4:
-                user_int = int(user_input)
-                return f"+{user_input}"
+                user_int = int(user_input) #if it's 4 digits long and it can parse, it's a valid positive number.
+                return f"+{user_input}" #We add the plus sign and return it.
             else:
                 print("Invalid input. Please enter a valid positive or negative 4 digit number.")
-                return '-1'
+                return '-1' #-1 is the error code for an invalid input
         except ValueError:
             print("Invalid input. Please enter a valid positive or negative 4 digit number.")
-            return "-1"
+            return "-1" #-1 is the error code for an invalid input
         
         
     
@@ -150,6 +169,9 @@ class Simulator:
     def read(self, addr):
         '''Reads a word from the keyboard into a specific location in memory.'''
         user_input = input(f'Enter a positive or negative 4 digit number into memory register {addr} (ex: +1234 or -4321): ')
+        #From this point down, we validate and format the user input to be stored properly in the registers.
+        #If user entered a positive value or "0000" without a +, it will be added. And it will check if entered a 4 digit number.
+        #Negative values must be entered with a - to be valid. Validated and formated input will be stored in formatted_input.
         formatted_input = ""
         success = False
         while not success:
@@ -158,99 +180,107 @@ class Simulator:
                 success = True
             else:
                 user_input = input(f'Enter a positive or negative 4 digit number into memory register {addr} (ex: +1234 or -4321): ')
-        self.log.append(f"'{formatted_input}' was read from keyboard into address: {str(addr).zfill(2)}")
-        self.registers[int(addr)] = formatted_input
+        self.log.append(f"'{formatted_input}' was read from keyboard into address: {str(addr).zfill(2)}") #Logs the operation.
+        self.registers[int(addr)] = formatted_input #Stores the formatted input into the desired register.
         return True
     
     def write(self, addr):
         '''Writes a word from a specific location in memory to screen.'''
-        word = self.registers[int(addr)]
-        self.log.append(f"{word} was written to screen from address: {str(addr).zfill(2)}")
-        print(word)
+        word = self.registers[int(addr)] #Gets the word from the register.
+        self.log.append(f"{word} was written to screen from address: {str(addr).zfill(2)}") #Logs the operation.
+        print(word) #Prints the word to the screen.
         return True
     
     '''Load/store operations'''
     
     def load(self, addr):
         '''Loads a word from a specific location in memory into the accumulator.'''
-        word = self.registers[int(addr)]
-        self.log.append(f"{word} was loaded to the accumulator from address: {str(addr).zfill(2)}")
-        self.accumulator = word
+        word = self.registers[int(addr)] #Gets the word from the register.
+        self.log.append(f"{word} was loaded to the accumulator from address: {str(addr).zfill(2)}") #Logs the operation.
+        self.accumulator = word #Loads the word into the accumulator.
         return True
     
     def store(self, addr):
         '''Stores a word from the accumulator into a specific location in memory.'''
-        self.log.append(f"{self.accumulator} was stored from the accumulator into address: {str(addr).zfill(2)}")
-        self.registers[int(addr)] = self.accumulator
+        self.log.append(f"{self.accumulator} was stored from the accumulator into address: {str(addr).zfill(2)}") #Logs the operation.
+        self.registers[int(addr)] = self.accumulator #Stores the word from the accumulator into the register.
         return True
     
     '''Arithmetic operations'''
     
     def add(self, addr):
         '''Adds a word from a specific location in memory to the word in the accumulator (leaves the result in the accumulator)'''
-        intial_acc = self.accumulator
-        result = int(self.accumulator) + int(self.registers[int(addr)])
-        if result > 9999 or result < -9999:
+        intial_acc = self.accumulator #Saves the initial value of the accumulator for the log.
+        result = int(self.accumulator) + int(self.registers[int(addr)]) #Adds the word from the register to the word in the accumulator.
+        if result > 9999 or result < -9999: #Checks if the result is too large to be stored in the accumulator.
             print(f"Overflow error on addition in address {addr}.\nThe result is too large to be stored in the accumulator. The program will now be terminated.")
             self.log.append(f"Overflow error on addition in address {addr}. The result is too large to be stored in the accumulator.")
             return False
-        elif result > 0:
+        #The following elif and else statements format the result to be stored in the accumulator.
+        elif result > 0: 
             self.accumulator = f"+{str(result).zfill(4)}"
         elif result == 0:
             self.accumulator = "+0000"
         else:
             self.accumulator = f"{str(result).zfill(4)}"
+        #It's a long log entry, but is usefull to see what happened.
         self.log.append(f"{intial_acc} from the accumulator was added to {self.registers[int(addr)]} from address: {str(addr).zfill(2)} and result ({self.accumulator}) was stored back in the accumulator")
         return True
     
     def subtract(self, addr):
         '''Subtracts a word from a specific location in memory from the word in the accumulator (leaves the result in the accumulator)'''
-        intial_acc = self.accumulator
-        result = int(self.accumulator) - int(self.registers[int(addr)])
-        if result > 9999 or result < -9999:
+        intial_acc = self.accumulator #Saves the initial value of the accumulator for the log.
+        result = int(self.accumulator) - int(self.registers[int(addr)]) #Subtracts the word from the register from the word in the accumulator.
+        if result > 9999 or result < -9999: #Checks if the result is too large to be stored in the accumulator.
             print(f"Overflow error on subtraction in address {addr}.\nThe result is too large to be stored in the accumulator. The program will now be terminated.")
             self.log.append(f"Overflow error on subtraction in address {addr}. The result is too large to be stored in the accumulator.")
             return False
+        #The following elif and else statements format the result to be stored in the accumulator.
         elif result > 0:
             self.accumulator = f"+{str(result).zfill(4)}"
         elif result == 0:
             self.accumulator = "+0000"
         else:
             self.accumulator = f"{str(result).zfill(4)}"
+        #It's a long log entry, but is usefull to see what happened.
         self.log.append(f"{intial_acc} from the accumulator was subtracted by {self.registers[int(addr)]} from address: {str(addr).zfill(2)} and result ({self.accumulator}) was stored back in the accumulator")
         return True
     
     def divide(self, addr):
         '''Divides the word in the accumulator by a word from a specific location in memory (leaves the result in the accumulator).'''
-        intial_acc = self.accumulator
-        result = int(self.accumulator) // int(self.registers[int(addr)])
-        if result > 9999 or result < -9999:
+        intial_acc = self.accumulator #Saves the initial value of the accumulator for the log.
+        result = int(self.accumulator) // int(self.registers[int(addr)]) #Divides the word in the accumulator by the word from the register.
+        if result > 9999 or result < -9999: #Checks if the result is too large to be stored in the accumulator.
             print(f"Overflow error on division in address {addr}.\nThe result is too large to be stored in the accumulator. The program will now be terminated.")
             self.log.append(f"Overflow error on division in address {addr}. The result is too large to be stored in the accumulator.")
             return False
+        #The following elif and else statements format the result to be stored in the accumulator.
         elif result > 0:
             self.accumulator = f"+{str(result).zfill(4)}"
         elif result == 0:
             self.accumulator = "+0000"
         else:
             self.accumulator = f"{str(result).zfill(4)}"
+        #It's a long log entry, but is usefull to see what happened.
         self.log.append(f"{intial_acc} from the accumulator was divided by {self.registers[int(addr)]} from address: {str(addr).zfill(2)} and result ({self.accumulator}) was stored back in the accumulator")
         return True
     
     def multiply(self, addr):
         '''Multiplies a word from a specific location in memory to the word in the accumulator (leaves the result in the accumulator).'''
-        intial_acc = self.accumulator
-        result = int(self.accumulator) * int(self.registers[int(addr)])
-        if result > 9999 or result < -9999:
+        intial_acc = self.accumulator #Saves the initial value of the accumulator for the log.
+        result = int(self.accumulator) * int(self.registers[int(addr)]) #Multiplies the word in the accumulator by the word from the register.
+        if result > 9999 or result < -9999: #Checks if the result is too large to be stored in the accumulator.
             print(f"Overflow error on multiplication in address {addr}.\nThe result is too large to be stored in the accumulator. The program will now be terminated.")
             self.log.append(f"Overflow error on multiplication in address {addr}. The result is too large to be stored in the accumulator.")
             return False
+        #The following elif and else statements format the result to be stored in the accumulator.
         elif result > 0:
             self.accumulator = f"+{str(result).zfill(4)}"
         elif result == 0:
             self.accumulator = "+0000"
         else:
             self.accumulator = f"{str(result).zfill(4)}"
+        #It's a long log entry, but is usefull to see what happened.
         self.log.append(f"{intial_acc} from the accumulator was multiplied by {self.registers[int(addr)]} from address: {str(addr).zfill(2)} and result ({self.accumulator}) was stored back in the accumulator")
         return True
     
@@ -258,28 +288,34 @@ class Simulator:
 
     def branch(self, addr):
         '''Branches to a specific location in memory.'''
-        self.log.append(f"Program branched to address: {str(addr).zfill(2)}")
+        #Sets the current address to the address specified in the instruction.
+        #It subtracts 1 from the desired address since the program moves to next location upon returning.
         self.cur_addr = int(addr) - 1
+        self.log.append(f"Program branched to address: {str(addr).zfill(2)}") #Logs the operation
         return True
     
     def branch_neg(self, addr):
         '''Branches to a specific location in memory if the accumulator is negative.'''
+        #Sets the current address to the address specified in the instruction if accumulator is negative.
+        #It subtracts 1 from the desired address since the program moves to next location upon returning.
         if int(int(self.accumulator)) < 0:
-            self.log.append(f"Program branched to address: {str(addr).zfill(2)} since the accumulator was negative({self.accumulator})")
             self.cur_addr = int(addr) - 1
+            self.log.append(f"Program branched to address: {str(addr).zfill(2)} since the accumulator was negative({self.accumulator})") #Logs the operation
         return True
     
     def branch_zero(self, addr):
         '''Branches to a specific location in memory if the accumulator is zero.'''
+        #Sets the current address to the address specified in the instruction if accumulator is "+0000".
+        #It subtracts 1 from the desired address since the program moves to next location upon returning.
         if int(self.accumulator) == "+0000":
-            self.log.append(f"Program branched to address: {str(addr).zfill(2)} since the accumulator was zero({self.accumulator})")
             self.cur_addr = int(addr) - 1
+            self.log.append(f"Program branched to address: {str(addr).zfill(2)} since the accumulator was zero({self.accumulator})") #Logs the operation
         return True
     
     def halt(self):
         '''Halts the program.'''
         self.log.append(f"Program was halted")
-        return False
+        return False #Returns false to stop the program.
     
 
 '''Main functions'''
