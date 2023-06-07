@@ -23,20 +23,24 @@ class Simulator:
     def open_file(self, file_name):
         '''Opens a file and loads the contents into the registers'''
         if os.path.exists(file_name):
-            with open(file_name) as input_file:
-                addr = 0 
-                for line in input_file:
-                    line = line.strip()
-                    #make sure its a + or a -
-                    if len(line) == 5:
-                        self.registers[addr] = line
-                    elif line == "-99999":
-                        return True
-                    else:
-                        print(f"Invalid line in file: {line}")
-                        return False
-                    addr += 1
-            return True
+            if file_name.endswith('.txt'):
+                with open(file_name) as input_file:
+                    addr = 0 
+                    for line in input_file:
+                        line = line.strip()
+                        #make sure its a + or a -
+                        if len(line) == 5:
+                            self.registers[addr] = line
+                        elif line == "-99999":
+                            return True
+                        else:
+                            print(f"Invalid line in file: {line}")
+                            return False
+                        addr += 1
+                return True
+            else:
+                print('Wrong file type. Must be a .txt file')
+                return
         else:
             print(f"File '{file_name}' does not exist")
             return False
@@ -45,7 +49,7 @@ class Simulator:
         '''Runs each line of the simulator and calls the controller for the appropriate instructions'''
         choice = True #Stops while loop if user aborts or halts
         while self.cur_addr < 100 and choice:
-            choice = self.controller(self.registers[self.cur_addr][1:3], self.registers[self.cur_addr][1:-3]) #Sends instruction code and address to controller
+            choice = self.controller(self.registers[self.cur_addr][1:3], self.registers[self.cur_addr][3:]) #Sends instruction code and address to controller
             self.cur_addr += 1 #Moves to next address
         return
     
@@ -107,13 +111,21 @@ class Simulator:
     def read(self, addr):
         '''Reads a word from the keyboard into a specific location in memory.'''
         self.log.append(f"Word was read from keyboard into address: {str(addr).zfill(2)}")
+        print(f'ADDRESS IS {addr}')
         print("read")
+        addr = int(addr)
+        user_input = input('Enter a 4 digit number into memory: ')
+        self.registers[addr] = user_input
+        print(f'REGISTERS ARE {self.registers}')
         return
     
     def write(self, addr):
         '''Writes a word from a specific location in memory to screen.'''
         self.log.append(f"Word was written to screen from address: {str(addr).zfill(2)}")
+        print(f'Address is {addr}')
         print("write")
+        addr = int(addr)
+        print(f'TO SCREEN: {self.registers[addr]}')
         return
     
     '''Load/store operations'''
@@ -121,13 +133,21 @@ class Simulator:
     def load(self, addr):
         '''Loads a word from a specific location in memory into the accumulator.'''
         self.log.append(f"Word was loaded to the accumulator from address: {str(addr).zfill(2)}")
+        print(f'addr is {addr}')
         print("load")
+        addr = int(addr)
+        self.accumulator = self.registers[addr]
+        print(f'accumulator is now {self.accumulator}')
         return
     
     def store(self, addr):
         '''Stores a word from the accumulator into a specific location in memory.'''
         self.log.append(f"Word was stored from the accumulator into address: {str(addr).zfill(2)}")
+        print(f'addr is {addr}')
         print("store")
+        addr = int(addr)
+        self.registers[addr] = self.accumulator
+        print(f'accumulator is now {self.accumulator}')
         return
     
     '''Arithmetic operations'''
