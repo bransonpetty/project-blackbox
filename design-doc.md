@@ -25,9 +25,9 @@ by moving them to a different location or renaming them if they are important to
 
 How to run the program:
 
-'''shell
+```shell
 python main.py (filename).txt
-'''
+```
 
 User Stories:
 Brian has taken an interest in computer science and wants to understand at a base level how assembly
