@@ -25,7 +25,7 @@ by moving them to a different location or renaming them if they are important to
 
 How to run the program:
 
-'''
+'''shell
 python main.py (filename).txt
 '''
 
