@@ -3,7 +3,7 @@ import os
 from main import *
 # python -m pytest test.py 
 
-def test_add(): #tests the adding use case
+def test_add(monkeypatch): #tests the adding use case
     print('\nThis is the add use case, input file1.txt, then +0008\
 , then +0006, and finally n\n')
     with open ('file1.txt', 'w') as file:
