@@ -1,5 +1,7 @@
 # Design Documentation
 
+Designed and built by: Branson Petty, Connor Barry, Noah Potter, and Pedro Valente.
+
 The purpose of this program is to create a functional assembly program that reads an instruction file
 line by line. Executing commands and utilizing 100 registers as virtual memory that each store signed 
 4 digit numbers, referred to as words, and the each of the operations.
@@ -9,7 +11,7 @@ and to prevent the user from crashing the program by running a file type that th
 be able to read accurately. To run your program file, make sure that the file containing the instructions
 is located in the same folder as the python script. Enter the filename with the extension.
 
-A few things to keep in mind while using the program:
+## A few things to keep in mind while using the program:
 - You must use a halt instruction at the end of the program routine you mean to run. That will prevent
 unwanted instructions from being performed. If no halt instruction is present the program will run 
 every register until it reaches register 99.
@@ -23,24 +25,37 @@ registers.
 - If you decide to run the program again, your past reports will be overwritten. Make sure to save them
 by moving them to a different location or renaming them if they are important to you.
 
-How to run the program:
+## How to run the program:
+
+You may run the program by opening the command shell in the directory containing both the program
+python script and your instructions file and running the command bellow. Where (filename) is the
+name of the file containing your instructions:
 
 ```shell
 python main.py (filename).txt
 ```
+Example: python main.pt file.txt
 
-User Stories:
-Brian has taken an interest in computer science and wants to understand at a base level how assembly
+You may also opt to simply run the program without the file name. In this case, the program will
+simply prompt you to input the file name with extension before running. Example bellow:
+
+ ```shell
+python main.py (filename).txt
+```
+
+## User Stories:
+
+- Brian has taken an interest in computer science and wants to understand at a base level how assembly
 instructions work. He is able to write short instruction files to learn how each of them work and 
 eventually how to preform multiple successive functions.
 
-Justin is designing a program on his raspberry pi. Because the raspberry pi doesn't have much in the
+- Justin is designing a program on his raspberry pi. Because the raspberry pi doesn't have much in the
 way of memory he needs to design a program at the lowest level to improve memory and preformance. 
 For easier testing than running his long instruction programs on his raspberry pi he is able to run
 this program from his computer and use the debugger to watch each register as a line of instruction
 is read.
 
-Use Cases: 
+## Use Cases: 
 
 - ADD (30xx) - We load the number 8 from a register and add it to the accumulator which has the value
     6 in it previously. Once the operation has finished the accumulator will have the value of 14
