@@ -43,6 +43,23 @@ simply prompt you to input the file name with extension before running. Example 
 python main.py (filename).txt
 ```
 
+## Tecnical implementation:
+
+- Main function: Accepts the user input (file name) and gives the user the option to run another file
+at the end of each file run.
+- Simulator_run function: Once file is input by user it makes all the class function calls necessary
+to run the file.
+- Simulator class: Holds all the functionality of the assembly executor. Contains the following functions:
+    - open_file: Reads the file and loads the instructions into the registers.
+    - run: Runs each line of the registry.
+    - controller: Directs each instruction to its proper function.
+    - report: Generates a report at the end of each program run.
+    - invalid_instruction: Validates if each instruction code in the registry is valid. If invalid, prompts
+    the user to either terminate the program on continue from the next line.
+    - format_input: Validates and formats user input into a format that is appropriate for the register.
+    - Instruction functions: Those are all the functions necessary to run each instruction available in the program.
+- Unit tests were done using the pytest module.
+
 ## User Stories:
 
 - Brian has taken an interest in computer science and wants to understand at a base level how assembly
