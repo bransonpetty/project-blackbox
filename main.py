@@ -1,5 +1,19 @@
 '''
-OPERATION CODES FOR THE PROGRAM:
+Project Blackbox
+
+Designed and built by: Branson Petty, Connor Barry, Noah Potter, and Pedro Valente.
+
+The purpose of this program is to create a functional assembly program that reads an instruction file
+line by line. Executing commands and utilizing 100 registers as virtual memory that each store signed 
+4 digit numbers, referred to as words, and the each of the operations.
+
+The program was designed to only run .txt files. This decision was made to assure maximum accuracy
+and to prevent the user from crashing the program by running a file type that the program wouldn't
+be able to read accurately. To run your program file, make sure that the file containing the instructions
+is located in the same folder as the python script. Enter the filename with the extension.
+
+These are the instruction codes that can be used when designing your own assembly program:
+
 I/O operations:
 READ = 10 Read a word from the keyboard into a specific location in memory.
 WRITE = 11 Write a word from a specific location in memory to screen.
