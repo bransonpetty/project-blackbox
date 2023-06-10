@@ -85,29 +85,21 @@ to run the file.
 ## Example of an valid instruction file:
 
 The following is and example of the correct format of a file to be run through the program. 
-Make sure all the instructions are written on a *.txt file.
+Make sure all the instructions are stored on a *.txt file.
 
->+1007
->
->+1008
->
->+2007
->
->+2008
->
->+2109
->
->+1109
->
->+4300
->
->+0000
->
->+0000
->
->+0000
->
->-99999
+```
++1007
++1008
++2007
++2008
++2109
++1109
++4300
++0000
++0000
++0000
+-99999
+```
 
 ## User Stories:
 
