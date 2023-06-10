@@ -40,7 +40,7 @@ You may also opt to simply run the program without the file name. In this case, 
 simply prompt you to input the file name with extension before running. Example bellow:
 
  ```shell
-python main.py (filename).txt
+python main.py
 ```
 
 ## Tecnical implementation:
