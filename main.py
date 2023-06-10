@@ -74,7 +74,7 @@ class Simulator:
                 return True
             else:
                 print('Wrong file type. Must be a .txt file')
-                return
+                return False
         else:
             print(f"File '{file_name}' does not exist")
             return False
@@ -95,7 +95,7 @@ class Simulator:
         elif instruction == "00":
             choice = True
         elif instruction == "10":
-            choiece = self.read(addr)
+            choice = self.read(addr)
         elif instruction == "11":
             choice = self.write(addr)
         elif instruction == "20":
@@ -157,7 +157,10 @@ class Simulator:
     def format_input(self, user_input):
         '''Validates the input for the address'''
         try:
-            if user_input[0] == "-" or user_input[0] == "+": #It first checks if a operation sign is present.
+            if len(user_input) == 0:
+                print("No input. Please enter a valid positive or negative 4 digit number.")
+                return '-1' #-1 is the error code for an invalid input
+            elif user_input[0] == "-" or user_input[0] == "+": #It first checks if a operation sign is present.
                 if len(user_input) == 5: #If it is, it checks if the number is 4 digits long.
                     user_int = int(user_input) #If it can't parse, it's not a number. A ValueError is raised.
                     return user_input #If it parses successfully, it returns the input as is.
@@ -236,7 +239,7 @@ class Simulator:
         elif result == 0:
             self.accumulator = "+0000"
         else:
-            self.accumulator = f"{str(result).zfill(4)}"
+            self.accumulator = f"{str(result).zfill(5)}" 
         #It's a long log entry, but is usefull to see what happened.
         self.log.append(f"{intial_acc} from the accumulator was added to {self.registers[int(addr)]} from address: {str(addr).zfill(2)} and result ({self.accumulator}) was stored back in the accumulator")
         return True
@@ -255,7 +258,7 @@ class Simulator:
         elif result == 0:
             self.accumulator = "+0000"
         else:
-            self.accumulator = f"{str(result).zfill(4)}"
+            self.accumulator = f"{str(result).zfill(5)}"
         #It's a long log entry, but is usefull to see what happened.
         self.log.append(f"{intial_acc} from the accumulator was subtracted by {self.registers[int(addr)]} from address: {str(addr).zfill(2)} and result ({self.accumulator}) was stored back in the accumulator")
         return True
@@ -264,6 +267,7 @@ class Simulator:
         '''Divides the word in the accumulator by a word from a specific location in memory (leaves the result in the accumulator).'''
         intial_acc = self.accumulator #Saves the initial value of the accumulator for the log.
         result = int(self.accumulator) // int(self.registers[int(addr)]) #Divides the word in the accumulator by the word from the register.
+        #NO DIVISION OPERATION SHOULD RESULT IN OVERFLOW, I'M STILL LEAVING THIS HERE IN CASE THERE IS ANY ABNORMALITY I DIDN'T PREDICT.
         if result > 9999 or result < -9999: #Checks if the result is too large to be stored in the accumulator.
             print(f"Overflow error on division in address {addr}.\nThe result is too large to be stored in the accumulator. The program will now be terminated.")
             self.log.append(f"Overflow error on division in address {addr}. The result is too large to be stored in the accumulator.")
@@ -274,7 +278,7 @@ class Simulator:
         elif result == 0:
             self.accumulator = "+0000"
         else:
-            self.accumulator = f"{str(result).zfill(4)}"
+            self.accumulator = f"{str(result).zfill(5)}"
         #It's a long log entry, but is usefull to see what happened.
         self.log.append(f"{intial_acc} from the accumulator was divided by {self.registers[int(addr)]} from address: {str(addr).zfill(2)} and result ({self.accumulator}) was stored back in the accumulator")
         return True
@@ -293,7 +297,7 @@ class Simulator:
         elif result == 0:
             self.accumulator = "+0000"
         else:
-            self.accumulator = f"{str(result).zfill(4)}"
+            self.accumulator = f"{str(result).zfill(5)}"
         #It's a long log entry, but is usefull to see what happened.
         self.log.append(f"{intial_acc} from the accumulator was multiplied by {self.registers[int(addr)]} from address: {str(addr).zfill(2)} and result ({self.accumulator}) was stored back in the accumulator")
         return True
@@ -321,7 +325,7 @@ class Simulator:
         '''Branches to a specific location in memory if the accumulator is zero.'''
         #Sets the current address to the address specified in the instruction if accumulator is "+0000".
         #It subtracts 1 from the desired address since the program moves to next location upon returning.
-        if int(self.accumulator) == "+0000":
+        if self.accumulator == "+0000":
             self.cur_addr = int(addr) - 1
             self.log.append(f"Program branched to address: {str(addr).zfill(2)} since the accumulator was zero({self.accumulator})") #Logs the operation
         return True
