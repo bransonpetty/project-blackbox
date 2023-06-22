@@ -2,6 +2,7 @@ import tkinter as tk
 from main import Simulator
 from tkinter import filedialog
 
+#window = tk.Tk()
 class GUI(tk.Tk):
     def __init__(self):
         super().__init__() 
@@ -19,7 +20,7 @@ class GUI(tk.Tk):
         self.open_file_button.pack(side=tk.BOTTOM, padx=10, pady=10) 
 
         self.run_file_button = tk.Button(
-            bottom_right_frame, text="RUN FILE", command=self.run_file #packed run file button into bottom right frame. calls run_file when clicked.
+            bottom_right_frame, text="Run File", command=self.run_file #packed run file button into bottom right frame. calls run_file when clicked.
         )
         self.run_file_button.pack(side=tk.BOTTOM, padx=10, pady=10)
 
