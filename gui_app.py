@@ -63,12 +63,12 @@ def process_input(user_input):
     #REPLACE WITH PROCESSING LOGIC
     return f'Processed input: {user_input}'
 
+'''GUI RENDERING'''
+
 window = tk.Tk()
-
-canvas = tk.Canvas(window, width=800, height=800)
-
 window.title("Project Blackbox")
 window.geometry("800x800")
+
 simulator = Simulator()  # create an instance of simulator
 register_labels = {}
 create_register_display()
