@@ -13,7 +13,7 @@ import pytest
 import mock
 import builtins
 import os
-from main import *
+from simulator import *
 # python -m pytest test.py
  
 
