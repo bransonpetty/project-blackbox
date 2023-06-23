@@ -63,6 +63,7 @@ class GUI_Controller:
         insta.console_memory = ""
         insta.log = []
         self.refresh_table()
+        self.refresh_accumulator()
 
     def clear_console(self):
         pass
