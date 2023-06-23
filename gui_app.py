@@ -14,6 +14,13 @@ class GUI(tk.Tk):
         self.geometry("800x800")
         self.simulator = Simulator()  # create an instance of simulator
         self.register_labels = {}
+        
+        self.register_frame = tk.Frame(self) # Create a frame to hold register labels
+        self.register_frame.pack(side=tk.LEFT, fill=tk.Y) #pack inside main window
+
+        # Create a canvas to hold register frame, and also a scrollbar
+        self.canvas = tk.Canvas(self.register_frame)
+        self.inner_frame = tk.Frame(self.canvas)
         self.create_register_display()
 
         bottom_right_frame = tk.Frame(self, width=400, height=200) #create bottom right frame
@@ -48,43 +55,40 @@ class GUI(tk.Tk):
 
     def create_register_display(self):
         registers = self.simulator.registers
-
-     
-        register_frame = tk.Frame(self) # Create a frame to hold register labels
-        register_frame.pack(side=tk.LEFT, fill=tk.Y) #pack inside main window
-
-        # Create a canvas to hold register frame, and also a scrollbar
-        canvas = tk.Canvas(register_frame)
         scrollbar = tk.Scrollbar(
-            register_frame, orient=tk.VERTICAL, command=canvas.yview
+            self.register_frame, orient=tk.VERTICAL, command=self.canvas.yview
         )
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        canvas.pack(side=tk.LEFT, fill=tk.Y)
+        self.canvas.pack(side=tk.LEFT, fill=tk.Y)
 
         # configure canvas to work with scrollbar
-        canvas.configure(yscrollcommand=scrollbar.set)
-        canvas.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all"))) #ensures whenever the size or position of canvas changes, scrollable area is updated
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+        self.canvas.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))) #ensures whenever the size or position of canvas changes, scrollable area is updated
 
         # Create a frame inside the canvas to hold the register labels
-        inner_frame = tk.Frame(canvas)
-        canvas.create_window((0, 0), window=inner_frame, anchor="nw")
+        self.canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
 
         # Create a label for each register and its value
-        for register, value in registers.items():
-            label = tk.Label(inner_frame, text=f"{register}: {value}")
-            label.pack(anchor=tk.W)  # west
-            self.register_labels[register] = label
+        self.update_register_display()
 
     def update_register_display(self):
         registers = self.simulator.registers
 
         # Update the label for each register with its new value
+        self.canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
+        # Create a label for each register and its value
         for register, value in registers.items():
-            label = self.register_labels[register]
-            label.config(text=f"{register}: {value}")
-
-        # Schedule the next update
-        self.after(1000, self.update_register_display)
+            # reg_frame_1 = tk.Frame(self.inner_frame)
+            # reg_frame_1.grid(row=int(register), column=0, sticky="NSEW")
+            # reg_label_1 = tk.Label(master=reg_frame_1, text=f"{register}")
+            # reg_label_1.pack()
+            # reg_frame_2 = tk.Frame(self.inner_frame)
+            # reg_frame_2.grid(row=int(register), column=1, sticky="NSEW")
+            # reg_label_2 = tk.Label(master=reg_frame_2, text=f"{value}")
+            # reg_label_2.pack()
+            label = tk.Label(self.inner_frame, text=f"{register}: {value}")
+            label.pack(anchor=tk.W)  # west
+            self.register_labels[register] = label
 
     def open_file(self):
         # Function to open file
@@ -92,15 +96,30 @@ class GUI(tk.Tk):
 
         if file_path: #file is selected
             self.system_output.config(text=f'Opening file {file_path}...')
+            error = False
+            with open(file_path) as input_file:
+                addr = 0 
+                for line in input_file:
+                    line = line.strip()
+                    #make sure its a + or a -
+                    if len(line) == 5:
+                        self.simulator.registers[addr] = line
+                    elif line == "-99999":
+                        break
+                    else:
+                        self.system_output.config(text=f'Error: {line} in your file is not a valid instruction.')
+                        error = True
+                    addr += 1
+            if not error:
+                for widgets in self.inner_frame.winfo_children():
+                    widgets.destroy()
+                self.register_frame = tk.Frame(self) # Create a frame to hold register labels
+                self.register_frame.pack(side=tk.LEFT, fill=tk.Y) #pack inside main window
+                self.update_register_display()
             #do more
         
         else: #no file selected
             self.system_output.config(text = "No file selected")
-        
-
-    def run_file(self, file_name = "default"):
-        #function that runs file
-        self.system_output.config(text=f'Running file {file_name}...')
 
     def submit(self):
         user_input = self.user_input_box.get() #get the user input from entry box
@@ -111,42 +130,7 @@ class GUI(tk.Tk):
         #REPLACE WITH PROCESSING LOGIC
         return f'Processed input: {user_input}'
 
-'''GUI RENDERING'''
-
-window = tk.Tk()
-window.title("Project Blackbox")
-window.geometry("800x800")
-
-simulator = Simulator()  # create an instance of simulator
-register_labels = {}
-create_register_display()
-
-bottom_right_frame = tk.Frame(width=400, height=200) #create bottom right frame
-
-open_file_button = tk.Button(
-    bottom_right_frame, text="Open File", command=open_file #packing open file button into the bottom right frame, it calls open_file when clicked
-)
-open_file_button.pack(side=tk.BOTTOM, padx=10, pady=10) 
-
-run_file_button = tk.Button(
-    bottom_right_frame, text="Run File", command=run_file #packed run file button into bottom right frame. calls run_file when clicked.
-)
-run_file_button.pack(side=tk.BOTTOM, padx=10, pady=10)
-
-bottom_right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, padx=10, pady=10)
-
-top_right_frame = tk.Frame(width = 400, height = 200) #create top right frame
-top_right_frame.pack(side=tk.RIGHT, fill = tk.BOTH, padx=10, pady=10)
-
-input_label = tk.Label(top_right_frame, text = "INPUT") #make input label, pack it in top right frame
-input_label.pack(padx=10,pady=5) #pack input lable into main window
-
-user_input_box = tk.Entry(top_right_frame) #make user input entry , pack into top right frame
-user_input_box.pack(padx=10, pady=10) #Pack into main window
-
-submit_user_input_button = tk.Button(top_right_frame, text="SUBMIT", command=submit)
-submit_user_input_button.pack(padx=10, pady=5)
-
-system_output = tk.Label(top_right_frame, text = "OUTPUT") #create output label packed into top right frame
-system_output.pack(padx=10, pady=10) #pack into main window
-
+if __name__ == "__main__":
+    gui = GUI()
+    gui.update_register_display()  # Start the update loop
+    gui.mainloop()
