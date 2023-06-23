@@ -112,7 +112,6 @@ class GUI(tk.Tk):
                 self.register_frame = tk.Frame(self) # Create a frame to hold register labels
                 self.register_frame.pack(side=tk.LEFT, fill=tk.Y) #pack inside main window
                 self.update_register_display()
-            #do more
         
         else: #no file selected
             self.system_output.config(text = "No file selected")
