@@ -106,7 +106,9 @@ def open_file():
         #         self.register_frame.pack(side=tk.LEFT, fill=tk.Y) #pack inside main window
         #         self.update_register_display()
         #     #do more
-        
+        print('THIS IS WHATS IN THE BOX')
+        get_text = console_box.get("2.0", "end-1c") #this will get the second line of the textbox (under the total lines in file:) line
+        print(get_text)
     else: #no file selected
         console_box.insert(INSERT, f'NO FILE SELECTED')
 
