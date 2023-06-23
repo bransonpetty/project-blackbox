@@ -77,22 +77,27 @@ def open_file():
     error = False
     if file_path:
         with open(file_path) as input_file:
-            addr = 0
-            total_lines = 0
-            for line in input_file:
-                line = line.strip()
-                #make sure its a + or a -
-                if len(line) == 5:
-                    total_lines+=1
-                    registers[addr] = line
-                elif line == "-99999":
-                    console_box.configure(state='normal')
-                    console_box.insert(INSERT, f'Total lines in file: {total_lines}')
-                    break
-                else:
-                    console_box.insert(f'PLACEHOLDER')
-                    error = True
-                addr += 1
+            if file_path.endswith('.txt'):
+                addr = 0
+                total_lines = 0
+                for line in input_file:
+                    line = line.strip()
+                    #make sure its a + or a -
+                    if len(line) == 5:
+                        total_lines+=1
+                        registers[addr] = line
+                    elif line == "-99999": #marks the end of the file
+                        console_box.configure(state='normal')
+                        console_box.insert(INSERT, f'Total lines in file: {total_lines}')
+                        break
+                    else:
+                        console_box.insert(f'PLACEHOLDER')
+                        error = True
+                    addr += 1
+            else: #NOT A .TXT
+                console_box.configure(state='normal')
+                file_extension = file_path[-4:]
+                console_box.insert(INSERT, f'Unsupported file type. You entered a {file_extension}. Please select a .txt')
     #     if not error:
     #         for widgets in self.inner_frame.winfo_children():
     #             widgets.destroy()
