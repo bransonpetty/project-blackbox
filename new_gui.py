@@ -88,10 +88,11 @@ def open_file():
                         registers[addr] = line
                     elif line == "-99999": #marks the end of the file
                         console_box.configure(state='normal')
-                        console_box.insert(INSERT, f'Total lines in file: {total_lines}')
+                        console_box.insert(INSERT, f'Total lines in file: {total_lines}\n')
                         break
-                    else:
-                        console_box.insert(f'PLACEHOLDER')
+                    else: #length is not 5 and its not -99999
+                        console_box.configure(state='normal')
+                        console_box.insert(INSERT, f'PLACEHOLDER\n')
                         error = True
                     addr += 1
             else: #NOT A .TXT
