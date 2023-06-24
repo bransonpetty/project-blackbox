@@ -6,8 +6,8 @@ from tkinter import *
 
 class GUI_Controller:
     def open_file(self):
+        self.reset_memory()
         file_path = filedialog.askopenfilename(filetypes=(("Text File (*.txt)", "*.txt"),))
-
         error = False
         if file_path:
             counter = 0
@@ -66,7 +66,9 @@ class GUI_Controller:
         self.refresh_accumulator()
 
     def clear_console(self):
-        pass
+        console_box.config(state=tk.NORMAL)
+        console_box.delete('1.0', 'end')
+        console_box.config(state=tk.DISABLED)
 
 
 class Simulator_Controller:
@@ -145,8 +147,8 @@ class Simulator_Controller:
     def read_console(self, addr):
         self.current_addr = addr
         console_box.config(state='normal')
-        console_box.insert(END, f'Enter a positive or negative 4 digit number into memory register {addr}, then press enter to submit (ex: +1234 or -4321):')
-        console_box.insert(END, "")
+        console_box.insert(END, f'Enter a positive or negative 4 digit number into memory register {addr}, then press the submit button (ex: +1234 or -4321): ')
+        console_box.see(END)
         console_box.config(state='disabled')
         input_box.config(state="normal")
         submit_input['state'] = tk.NORMAL
@@ -203,6 +205,8 @@ class Simulator_Controller:
             input_box.delete(0, END)
 
         if success:
+            input_box['state'] = tk.DISABLED
+            submit_input['state'] = tk.DISABLED
             user_messages.config(text="Executing program...")
             control.refresh_table()
             self.run()
@@ -210,7 +214,7 @@ class Simulator_Controller:
     def console_write(self, addr):
         console_box.config(state='normal')
         console_box.insert(END, f"Value from register {addr}: {insta.registers[int(addr)]}\n\n")
-        console_box.see(END)
+        console_box.see('end')
         console_box.config(state='disabled')
         return True
     
@@ -224,6 +228,7 @@ class Simulator_Controller:
         clear_console_btn['state'] = tk.NORMAL
         run_btn["text"] = "Run"
         run_btn['bg'] = 'green'
+        run_btn['state'] = 'disabled'
         if self.error == False:
             user_messages.config(text="Program executed sucessfully.")
 
@@ -308,11 +313,11 @@ right_button_frame.pack(side='right')
 
 open_file_btn = tk.Button(left_button_frame, text="Open File", font=("Courier", 20), command=control.open_file, border=5, width=15, bg='dodgerblue3', fg='white')
 open_file_btn.pack(pady=(0,7.5), padx=(0,7.5), side='top')
-reset_btn = tk.Button(left_button_frame, text="Reset Memory", font=("Courier", 20), command=control.reset_memory,border=5, width=15, bg='firebrick1', fg='white', state='disabled')
+reset_btn = tk.Button(left_button_frame, text="Reset Memory", font=("Courier", 20), command=control.reset_memory,border=5, width=15, bg='firebrick1', fg='white')
 reset_btn.pack(side='bottom', pady=(7.5,0), padx=(0,7.5))
 run_btn = tk.Button(right_button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=15, bg='green', fg='white', state='disabled')
 run_btn.pack(pady=(0,7.5), side='top', padx=(7.5,0))
-clear_console_btn = tk.Button(right_button_frame, font=("Courier", 20), text="Clear Console", border=5, width=15, bg='firebrick1', fg='white', state='disabled')
+clear_console_btn = tk.Button(right_button_frame, font=("Courier", 20), command=control.clear_console,text="Clear Console", border=5, width=15, bg='firebrick1', fg='white')
 clear_console_btn.pack(side='bottom', pady=(7.5,0), padx=(7.5,0))
 
 window['background'] = 'red'
