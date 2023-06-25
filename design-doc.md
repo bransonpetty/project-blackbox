@@ -91,22 +91,26 @@ is read.
 
 ## Use Cases: 
 
-- ADD (30xx) - We load the number 8 from a register and add it to the accumulator which has the value
-    6 in it previously. Once the operation has finished the accumulator will have the value of 14
-- SUBTRACT (31xx) - We load the number 2 from a register and subract it from the accumulator value of
-    5 leaving the accumulator with a value of 3.
-- Using READ and MULTIPLY together the program can take a value from the user and load it into a 
-    register that can then be multiplyed by the accumulator value.
+- ADD (30xx) - Identify 2 digit function code. Reference register specified in the last two digits
+    of the direction. Add that registers value to the accumulator's existing value.
+- SUBTRACT (31xx) - Identify 2 digit function code. Reference register specified in the last two 
+    digits. Subtract the accumulator's value by the register's value.
+- DIVIDE (32xx) - Identify 2 digit function code. Reference register specified in the last two 
+    digits. Divide the accumulator by the register's value.
+- MULTIPLY (33xx) - Identify 2 digit function code. Reference register specified in the last two 
+    digits. Multiply the two values together and store their value in the accumulator.
+- Use READ and LOAD to store input in the accumulator. By first using READ to take and store the user's
+    input in a specified register we can use LOAD to reference that same register and store that address 
+    in the accumulator.
+- We can use READ and MULTIPLY to create a single function calculator. We can read in any user input and 
+    ,once stored, can be referenced to multiply one after the other.
 - Using BRANCHNEG we can check the accumulator for a negative value. If the accumulator is negative
     value we can issue a HALT command to branch to so the program quits.
-- Using READ and LOAD we can manually set the accumulator value by reading the user input into a 
-    register that LOAD can then reference to manually set the accumulator value.
 - The STORE operation can be used to copy the accumulator value into a register. This can be used to
     temporarily alter the value and revert back using LOAD.
-- After preforming an arithmetic operation we want to return the value so we will use the LOAD and 
-    WRITE functions to pull the value from the accumulator into a register and then write it to the console.
+- After preforming an arithmetic operation we want to return the value. We will use the LOAD and WRITE
+    functions to pull the value from the accumulator into a register and then write it to the console.
 - Using READ and WRITE we can echo a users input by returning the value immediately following it's input.
-- BRANCH, BRANCHNEG, and BRANCHZERO can be used for loops and conditionals by altering the accumulator
-    value.
-- Using READ and DIVIDE we can take the user input and divide the accumulator value by the user input.
+    We will store the value in a register and then use that register in the write command.
+- BRANCHNEG can be used for conditionals by altering the accumulator value based off a logic statement.
 
