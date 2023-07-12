@@ -298,7 +298,6 @@ class Simulator_Controller:
         user_color_primary = colorchooser.askcolor(title='choose a PRIMARY color')
         user_color_secondary = colorchooser.askcolor(title='choose a SECONDARY color')
         
-        print(f'PRIMARY COLOR IS + {user_color_primary}')
         primarycolor = user_color_primary[1] #refers to the HEX value
         offcolor = user_color_secondary[1] #hex value
 
