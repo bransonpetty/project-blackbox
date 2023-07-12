@@ -2,6 +2,7 @@ from tkinter import ttk
 import tkinter as tk
 from simulator import Simulator
 from tkinter import filedialog
+from tkinter import colorchooser
 from tkinter import *
 
 class GUI_Controller:
@@ -264,11 +265,42 @@ class Simulator_Controller:
         clear_console_btn['state'] = tk.NORMAL
         #Sets the "Cancel" button back to "Run" functionality
         run_btn["text"] = "Run"
-        run_btn['bg'] = 'green'
+        run_btn['bg'] = 'dodgerblue3'
         run_btn['state'] = 'disabled' #Keeps it disabled until new file is opened
         if self.error == False: #If not errors on halting, informs the user that program executed sucessfully
             user_messages.config(text="Program executed sucessfully.")
         #If there was an error, an error message will already be displaying.
+        
+    def change_all_colors(self, primarycolor, offcolor):
+        function_frame.configure(bg=primarycolor)
+        accumulator_frame.configure(bg=primarycolor)
+        accumulator_label.configure(bg=primarycolor)
+        accumulator_box.configure(bg=primarycolor)
+        input_frame.configure(bg=primarycolor)
+        button_frame.configure(bg=primarycolor)
+        left_button_frame.configure(bg=primarycolor)
+        right_button_frame.configure(bg=primarycolor)
+        color_btn.configure(background=offcolor)
+        run_btn.configure(background=offcolor)
+        open_file_btn.configure(background=offcolor)
+        clear_console_btn.configure(background=offcolor)
+        reset_btn.configure(background=offcolor)
+
+        
+
+    def choose_color(self):
+        '''Function will be called when button is clicked in window'''
+        user_color_primary = colorchooser.askcolor(title='choose a PRIMARY color')
+        user_color_secondary = colorchooser.askcolor(title='choose a SECONDARY color')
+        
+        print(f'PRIMARY COLOR IS + {user_color_primary}')
+        primarycolor = user_color_primary[1] #refers to the HEX value
+        offcolor = user_color_secondary[1] #hex value
+
+
+        self.change_all_colors(primarycolor, offcolor)
+        
+
 
 '''Initial GUI render'''
 
@@ -282,10 +314,15 @@ window = tk.Tk()
 window.title("Project Blackbox")
 window.geometry("1000x800")
 window.resizable(False, False)
+#window.configure(bg='green')
+offcolor = "#FFFFFF" #UVU white
+primarycolor='#4C721D' #UVU green
 
 #Creates and populates the GUI register table
 register_frame = ttk.Frame(window, border=20) #Frame containing the GUI register table
 register_frame.pack(fill='y', side=tk.LEFT)
+
+
 
 reg_table = ttk.Treeview(register_frame, selectmode ='browse', padding=2) #GUI register table
 
@@ -312,21 +349,24 @@ reg_table.heading("2", text ="Value")
 control.update_table()
 
 #Creates all the other GUI items to the right of the GUI register table
-function_frame = tk.Frame(window)
+function_frame = tk.Frame(window, bg =primarycolor) 
 function_frame.pack(side='right', fill='y')
 
-accumulator_frame = tk.Frame(function_frame) #Frame containing the accumulator display
+color_btn = tk.Button(function_frame, text='Choose Color', font=("Courier", 20), command=sim_op.choose_color, background=offcolor)
+color_btn.pack(pady=3)
+
+accumulator_frame = tk.Frame(function_frame, background=primarycolor) #Frame containing the accumulator display
 accumulator_frame.pack(side="top", pady=(20,0))
 
-accumulator_label = tk.Label(accumulator_frame, text="Accumulator: ", font=("Arial", 20)) #Accumulator title
+accumulator_label = tk.Label(accumulator_frame, text="Accumulator: ", font=("Arial", 20), bg=primarycolor) #Accumulator title
 accumulator_label.pack(side="left")
-accumulator_box = tk.Entry(accumulator_frame, font=("Arial", 20), width=6) #Accumulator display
+accumulator_box = tk.Entry(accumulator_frame, font=("Arial", 20), width=6, bg=primarycolor) #Accumulator display
 accumulator_box.pack(side="right")
 
 accumulator_box.insert(END, insta.accumulator) #Populates the accumulator
 accumulator_box['state'] = 'readonly'
 
-input_frame = tk.Frame(function_frame) #Frame containing console and user input
+input_frame = tk.Frame(function_frame, bg=primarycolor) #Frame containing console and user input
 input_frame.pack(side='top')
 
 console_label = tk.Label(input_frame, text="Console:", font=("Arial", 10)) #Console title
@@ -338,27 +378,28 @@ input_label = tk.Label(input_frame, text="User input:", font=("Arial", 10)) #Inp
 input_label.pack(padx = 20, pady = (0, 10))
 input_box = tk.Entry(input_frame, font=("Arial", 15), state="disabled") #Input box
 input_box.pack(pady = (0, 10))
-submit_input = tk.Button(input_frame, text="Submit Input", font=("Arial", 10), state='disabled', command=sim_op.submit_input) #Input submit button
+submit_input = tk.Button(input_frame, text="Submit Input", font=("Arial", 10), state='disabled', command=sim_op.submit_input, fg='black', bg=offcolor) #Input submit button
 submit_input.pack(pady = (0, 10))
 
-user_messages = tk.Label(input_frame, font=("Arial", 15), text="Select a instruction file to execute.", wraplength="400") #Text for messages directed to the user.
+user_messages = tk.Label(input_frame, font=("Arial", 15), text="Select a instruction file to execute.", wraplength="400", activebackground=primarycolor) #Text for messages directed to the user.
 user_messages.pack()
 
-button_frame = tk.Frame(function_frame) #Frame containing all the buttons
+button_frame = tk.Frame(function_frame, background=primarycolor) #Frame containing all the buttons
 button_frame.pack(side='bottom', anchor='c', fill='y', pady=(0, 70))
 
-left_button_frame = tk.Frame(button_frame) #Frame for buttons on the left
+left_button_frame = tk.Frame(button_frame, background=primarycolor) #Frame for buttons on the left
 left_button_frame.pack(side='left')
-right_button_frame = tk.Frame(button_frame) #Frame for buttons on the right
+right_button_frame = tk.Frame(button_frame, background=primarycolor) #Frame for buttons on the right
 right_button_frame.pack(side='right')
 
-open_file_btn = tk.Button(left_button_frame, text="Open File", font=("Courier", 20), command=control.open_file, border=5, width=15, bg='dodgerblue3', fg='white') #Button to open file
+open_file_btn = tk.Button(left_button_frame, text="Open File", font=("Courier", 20), command=control.open_file, border=5, width=15, bg=offcolor, fg='black') #Button to open file
 open_file_btn.pack(pady=(0,7.5), padx=(0,7.5), side='top')
-reset_btn = tk.Button(left_button_frame, text="Reset Memory", font=("Courier", 20), command=control.reset_memory,border=5, width=15, bg='firebrick1', fg='white') #Button to reset the memory
+reset_btn = tk.Button(left_button_frame, text="Reset Memory", font=("Courier", 20), command=control.reset_memory,border=5, width=15, bg=offcolor, fg='black') #Button to reset the memory
 reset_btn.pack(side='bottom', pady=(7.5,0), padx=(0,7.5))
-run_btn = tk.Button(right_button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=15, bg='green', fg='white', state='disabled') #Button to run and cancel the program execution
+run_btn = tk.Button(right_button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=15, bg=offcolor, fg='black', state='disabled') #Button to run and cancel the program execution, can use disabledforeground to make text more readable in needed
 run_btn.pack(pady=(0,7.5), side='top', padx=(7.5,0))
-clear_console_btn = tk.Button(right_button_frame, font=("Courier", 20), command=control.clear_console,text="Clear Console", border=5, width=15, bg='firebrick1', fg='white') #Button to clear the console
+clear_console_btn = tk.Button(right_button_frame, font=("Courier", 20), command=control.clear_console,text="Clear Console", border=5, width=15, bg=offcolor, fg='black') #Button to clear the console
 clear_console_btn.pack(side='bottom', pady=(7.5,0), padx=(7.5,0))
+
 
 window.mainloop() #Triggers the GUI initialization
