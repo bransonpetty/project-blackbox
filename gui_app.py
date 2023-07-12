@@ -373,12 +373,12 @@ accumulator_box['state'] = 'readonly'
 input_frame = tk.Frame(function_frame, bg=primarycolor) #Frame containing console and user input
 input_frame.pack(side='top')
 
-console_label = tk.Label(input_frame, text="Console:", font=("Arial", 10)) #Console title
+console_label = tk.Label(input_frame, text="Console:", font=("Arial", 10), bg=primarycolor) #Console title
 console_label.pack(side='top', padx = 20, pady = (10, 5), anchor="w")
 console_box = tk.Text(input_frame, state='disabled', wrap="word", height=18) #Console box
 console_box.pack(side='top', anchor='ne', padx = 20, pady = (0, 20))
 
-input_label = tk.Label(input_frame, text="User input:", font=("Arial", 10)) #Input title
+input_label = tk.Label(input_frame, text="User input:", font=("Arial", 10), bg=primarycolor) #Input title
 input_label.pack(padx = 20, pady = (0, 10))
 input_box = tk.Entry(input_frame, font=("Arial", 15), state="disabled") #Input box
 input_box.pack(pady = (0, 10))
