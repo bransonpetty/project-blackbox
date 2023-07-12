@@ -288,6 +288,8 @@ class Simulator_Controller:
         open_file_btn.configure(background=offcolor)
         clear_console_btn.configure(background=offcolor)
         reset_btn.configure(background=offcolor)
+        input_label.configure(bg=primarycolor)
+        console_label.configure(bg=primarycolor)
 
         
 
