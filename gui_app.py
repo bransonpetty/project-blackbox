@@ -10,7 +10,111 @@ from tkinter import *
 
 class GUI_Controller:
     '''Controls most of the updates to the GUI.'''
-    def open_file(self):
+    def load_instructions(self):
+
+        def open_file():
+            file_path = filedialog.askopenfilename(filetypes=(("Text File (*.txt)", "*.txt"),), parent=entry_window)
+            if file_path:
+                entry_box.delete("1.0", "end")
+                with open(file_path) as input_file:
+                    temp_text = input_file.read()
+                    entry_box.insert(END, temp_text)
+
+        def process():
+            with open("./temp.txt", "w") as temp:
+                temp.write(entry_box.get("1.0", END))
+            size_out = validate_input_size()
+            size_check = size_out[0]
+            loaded_instructions = size_out[1]
+            if not size_check:
+                return
+            instruction_check = validate_instructions(loaded_instructions)
+            if not instruction_check:
+                return
+            self.reset_memory()
+            populate_registers(loaded_instructions)
+            self.refresh_table()
+            run_btn['state'] = tk.NORMAL
+            user_messages.config(text="Input successfully loaded.") #Informs the user that file loaded sucessfully.
+            entry_window.destroy()
+            
+        
+        def validate_input_size():
+            line_list = []
+            with open("./temp.txt", "r") as temp:
+                for line in temp:
+                    if line != "":
+                        line_list.append(line[0:-1])
+                    elif line == "":
+                        break
+            if len(line_list) > 100:
+                entry_message.config(text="Error: Your input contain more than 100 instructions.")
+                return (False, [])
+            else:
+                return (True, line_list)
+        
+        def validate_instructions(loaded_instructions):
+            line_count = 1
+            for line in loaded_instructions:
+                try:
+                    _line_parse_test = int(line) #Tests if input if an integer
+                except: #If input is not an integer a ValueError will be triggered and an error is recorded
+                    entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
+                    return False
+                if len(line) == 5: #Correct lenght for a value with operator sign
+                    if line[0] == "+" or line[0] == "-": #Checks if operator sign is present
+                        line_count += 1
+                        continue #If no errors from parsing, input is valid
+                    else: #If the first character is not a operator sign and length is 5, input is invalid
+                        entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
+                        return False
+                elif len(line) == 4:
+                    if line[0] == "+" or line[0] == "-": #If operator sign is present, this is a 3 digit number, which is invalid
+                        entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
+                        return False
+                    else: #If the first character is not a operator sign and length is 4, input is valid
+                        line_count += 1
+                        continue #If no errors from parsing, input is valid
+                elif line == "-99999": #This means it's the end of the file.
+                    return True
+                elif line == "":
+                    entry_message.config(text=f'Error(line {line_count}): Your input must not have empty lines between instructions and must end with "-99999".')
+                    return False
+                else: #If none of the conditions above are met, the input is invalid
+                    entry_message.config(text=f'Error: {line} in your input is not a valid instruction.')
+                    return False
+            entry_message.config(text=f'Error(line {line_count}): Your input must end with "-99999".')
+            return False
+        
+        def populate_registers(loaded_instructions):
+            addr = 0
+            for line in loaded_instructions:
+                insta.registers[addr] = line
+                addr += 1
+
+        
+        entry_window = Toplevel(window, background=primarycolor)
+        entry_window.geometry("850x700")
+        entry_frame = tk.Frame(entry_window, bg=primarycolor)
+        entry_frame.pack()
+        box_frame = tk.Frame(entry_frame, bg=primarycolor)
+        box_frame.pack()
+        box_scroll = Scrollbar(box_frame)
+        box_scroll.pack(side='right', fill='y', pady=(20, 0))
+        entry_box = tk.Text(box_frame, wrap="word", width=100, yscrollcommand=box_scroll.set)
+        entry_box.pack(side='left', pady=(20, 0))
+        box_scroll.config(command = entry_box.yview)
+        entry_message = tk.Label(entry_frame, font=("Arial", 20), text='Enter instructions on the text box above or open a file containing the instructions, then press "Process Entry" to populate de registers.', wraplength=800, bg=primarycolor)
+        entry_message.pack(pady=20)
+        entry_button_frame = tk.Frame(entry_frame, bg=primarycolor)
+        entry_button_frame.pack()
+        process_btn = tk.Button(entry_button_frame, command=process, text="Process Entry", font=("Courier", 20), border=5, width=15, bg=offcolor, fg='black')
+        process_btn.pack(side="left", padx=30)
+        file_btn = tk.Button(entry_button_frame, command=open_file, text="Open File", font=("Courier", 20), border=5, width=15, bg=offcolor, fg='black')
+        file_btn.pack(side="right", padx=30)
+
+
+    def open_file(self): #legacy
         '''Opens the file and triggers the functions to prepare GUI to run script.'''
         self.reset_memory() #Resets the memory so the new file's information can be loaded in.
         #Opens file browser to select a txt file for instruction input.
@@ -44,7 +148,6 @@ class GUI_Controller:
             if not error: # If not errors were triggered, register table is loaded and program becames ready to run.
                 self.refresh_table()
                 run_btn['state'] = tk.NORMAL
-                reset_btn['state'] = tk.NORMAL
                 user_messages.config(text="File successfully loaded.") #Informs the user that file loaded sucessfully.
 
     def clear_table(self):
@@ -55,13 +158,68 @@ class GUI_Controller:
     def update_table(self):
         '''Repopulates all of the items in the register table.'''
         for register, value in insta.registers.items():
-            reg_table.insert("", 'end', text ="L1",
+            reg_table.insert("", 'end', text=value,
                         values =(register, value))
             
     def refresh_table(self):
         '''Updates the register table with the new values.'''
         self.clear_table()
         self.update_table()
+
+    def table_edit(self, event):
+        def edit_submit():
+            user_input = edit_box.get()
+            input_out = validate_input(user_input)
+            check_input = input_out[0]
+            formatted_input = input_out[1]
+            if not check_input:
+                return
+            insta.registers[old_values[0]] = formatted_input
+            self.refresh_table()
+            reg_window.destroy()
+            
+
+        def validate_input(user_input):
+            try:
+                _line_parse_test = int(user_input) #Tests if input if an integer
+            except: #If input is not an integer a ValueError will be triggered and an error is recorded
+                tk.messagebox.showerror("Invalid input", "Input is not a number.", parent=reg_window)
+                return (False, "Fail")
+            if len(user_input) == 5: #Correct lenght for a value with operator sign
+                if user_input[0] == "+" or user_input[0] == "-": #Checks if operator sign is present
+                    return (True, user_input)
+                else: #If the first character is not a operator sign and length is 5, input is invalid
+                    tk.messagebox.showerror("Invalid input", "Input is too long, please enter a 4 digit number with an operator.", parent=reg_window)
+                    return (False, "Fail") 
+            elif len(user_input) == 4:
+                if user_input[0] == "+" or user_input[0] == "-": #If operator sign is present, this is a 3 digit number, which is invalid
+                    tk.messagebox.showerror("Invalid input", "Input is too short, please enter a 4 digit number with an operator.", parent=reg_window)
+                    return (False, "Fail")
+                else: #If the first character is not a operator sign and length is 4, input is valid
+                    return (True, f"+{user_input}")
+            elif int(user_input) == 0:
+                return (True, "+0000")
+            elif user_input == "":
+                tk.messagebox.showerror("No input", "Input is empty, please enter a 4 digit number with an operator.", parent=reg_window)
+                return (False, "Fail")
+            else: #If none of the conditions above are met, the input is invalid
+                tk.messagebox.showerror("Invalid input", "Invalid Input", parent=reg_window)
+                return (False, "Fail")
+
+
+        item_id = event.widget.focus()
+        item = event.widget.item(item_id)
+        old_values = item['values']
+        old_values[1] = item['text']
+        reg_window = Toplevel(window, bg=primarycolor)
+        reg_window.geometry("300x150")
+        edit_label = tk.Label(reg_window, bg=primarycolor, font=("Arial", 15), text=f"Edit Register {old_values[0]}:")
+        edit_label.pack(pady=(10, 0))
+        edit_box = tk.Entry(reg_window, font=("Arial", 15))
+        edit_box.insert(0, str(old_values[1]))
+        edit_box.pack(pady = (10, 0))
+        edit_submit = tk.Button(reg_window, command=edit_submit, text="Save Register", font=("Courier", 15), border=5, width=15, bg=offcolor, fg='black')
+        edit_submit.pack(pady=(10, 0))
 
     def refresh_accumulator(self):
         '''Updates the accumulator with new values.'''
@@ -116,8 +274,6 @@ class GUI_Controller:
         right_button_frame.configure(bg=primarycolor)
         run_btn.configure(background=offcolor)
         open_file_btn.configure(background=offcolor)
-        clear_console_btn.configure(background=offcolor)
-        reset_btn.configure(background=offcolor)
         input_label.configure(bg=primarycolor)
         console_label.configure(bg=primarycolor)
         newStyle.configure('My.TFrame', background=primarycolor)
@@ -133,15 +289,6 @@ class GUI_Controller:
 
         self.change_all_colors(primarycolor, offcolor)
 
-    def text_window(self):
-        entry_box = Toplevel(window, background=primarycolor)
-        entry_box.geometry("850x700")
-        entry_frame = tk.Frame(entry_box, bg=primarycolor) #Frame containing console and user input
-        entry_frame.pack()
-        entry_box = tk.Text(entry_frame, wrap="word", width=100)
-        entry_box.pack(pady=(20, 0))
-
-
 
 class Simulator_Controller:
     '''Holds all of the GUI simulator functions'''
@@ -153,8 +300,6 @@ class Simulator_Controller:
             '''Controls behavior of the run/cancel button'''
             if run_btn["text"] == 'Run': #If the program is not running the button will have its text set to "Run".
                 open_file_btn['state'] = tk.DISABLED #Disables the ability to open a new file while program is running
-                reset_btn['state'] = tk.DISABLED #Disables the ability to reset the register while program is running
-                clear_console_btn['state'] = tk.DISABLED #Disables the ability to clear the console while program is running
                 run_btn['text'] = "Cancel" #Changes the run button to have the cancel functionality
                 run_btn['bg'] = 'red' #Changes button color to red
                 user_messages.config(text=f'Executing program...') #Informs the user that the program is running.
@@ -301,8 +446,6 @@ class Simulator_Controller:
         console_box.config(state='disabled') #Disables the text box after modifications.
         #Enables the Open file, Reset Memory, and Clear Console buttons after program execution.
         open_file_btn['state'] = tk.NORMAL
-        reset_btn['state'] = tk.NORMAL
-        clear_console_btn['state'] = tk.NORMAL
         #Sets the "Cancel" button back to "Run" functionality
         run_btn["text"] = "Run"
         run_btn['bg'] = 'dodgerblue3'
@@ -324,8 +467,19 @@ sim_op = Simulator_Controller()
 #Creates the window containing the program GUI
 window = tk.Tk()
 menubar = Menu(window)
-menubar.add_command(label="New Color", command=control.choose_color)
-menubar.add_command(label="New", command=control.text_window)
+filemenu = Menu(menubar, tearoff=0)
+filemenu.add_command(label="Load instructions", command=control.load_instructions)
+filemenu.add_command(label="Save")
+filemenu.add_command(label="Save as...")
+menubar.add_cascade(label="File", menu=filemenu)
+executemenu = Menu(menubar, tearoff=0)
+executemenu.add_command(label="Run", command=sim_op.run_cancel_control)
+executemenu.add_command(label="Clear console", command=control.clear_console)
+executemenu.add_command(label="Clear registers", command=control.reset_memory)
+menubar.add_cascade(label="Execution", menu=executemenu)
+stylemenu = Menu(menubar, tearoff=0)
+stylemenu.add_command(label="Change color scheme", command=control.choose_color)
+menubar.add_cascade(label="Style", menu=stylemenu)
 window.config(menu=menubar)
 window.title("Project Blackbox")
 window.geometry("1000x800")
@@ -362,6 +516,8 @@ reg_table.column("2", width = 300, anchor ='c')
 
 reg_table.heading("1", text ="Register")
 reg_table.heading("2", text ="Value")
+
+reg_table.bind("<Double-Button-1>", control.table_edit)
 
 control.update_table()
 
@@ -401,21 +557,9 @@ user_messages.pack(pady=(0, 10))
 button_frame = tk.Frame(function_frame, background=primarycolor) #Frame containing all the buttons
 button_frame.pack(side='bottom', anchor='c', fill='y', pady=(0, 70))
 
-left_button_frame = tk.Frame(button_frame, background=primarycolor) #Frame for buttons on the left
-left_button_frame.pack(side='left')
-right_button_frame = tk.Frame(button_frame, background=primarycolor) #Frame for buttons on the right
-right_button_frame.pack(side='right')
-
-open_file_btn = tk.Button(left_button_frame, text="Open File", font=("Courier", 20), command=control.open_file, border=5, width=15, bg=offcolor, fg='black') #Button to open file
-open_file_btn.pack(pady=(0,7.5), padx=(0,7.5), side='top')
-reset_btn = tk.Button(left_button_frame, text="Reset Memory", font=("Courier", 20), command=control.reset_memory,border=5, width=15, bg=offcolor, fg='black') #Button to reset the memory
-reset_btn.pack(side='bottom', pady=(7.5,0), padx=(0,7.5))
-run_btn = tk.Button(right_button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=15, bg=offcolor, fg='black', state='disabled') #Button to run and cancel the program execution, can use disabledforeground to make text more readable in needed
-run_btn.pack(pady=(0,7.5), side='top', padx=(7.5,0))
-clear_console_btn = tk.Button(right_button_frame, font=("Courier", 20), command=control.clear_console,text="Clear Console", border=5, width=15, bg=offcolor, fg='black') #Button to clear the console
-clear_console_btn.pack(side='bottom', pady=(7.5,0), padx=(7.5,0))
-
-
-
+open_file_btn = tk.Button(button_frame, text="Open File", font=("Courier", 20), command=control.load_instructions, border=5, width=15, bg=offcolor, fg='black') #Button to open file
+open_file_btn.pack(side='top', pady=(0, 10))
+run_btn = tk.Button(button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=15, bg=offcolor, fg='black', state='disabled') #Button to run and cancel the program execution, can use disabledforeground to make text more readable in needed
+run_btn.pack(side='bottom', pady=(10, 0))
 
 window.mainloop() #Triggers the GUI initialization
