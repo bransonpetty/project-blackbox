@@ -388,7 +388,7 @@ submit_input = tk.Button(input_frame, text="Submit Input", font=("Arial", 10), s
 submit_input.pack(pady = (0, 10))
 
 user_messages = tk.Label(input_frame, font=("Arial", 15), text="Select a instruction file to execute.", wraplength="400", activebackground=primarycolor) #Text for messages directed to the user.
-user_messages.pack()
+user_messages.pack(pady=(0, 10))
 
 button_frame = tk.Frame(function_frame, background=primarycolor) #Frame containing all the buttons
 button_frame.pack(side='bottom', anchor='c', fill='y', pady=(0, 70))
