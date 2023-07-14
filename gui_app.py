@@ -102,6 +102,37 @@ class GUI_Controller:
         reg_table.selection_set(cur_row)
         reg_table.focus_set()
 
+     def change_all_colors(self, primarycolor, offcolor):
+        function_frame.configure(bg=primarycolor)
+        accumulator_frame.configure(bg=primarycolor)
+        accumulator_label.configure(bg=primarycolor)
+        accumulator_box.configure(bg=primarycolor)
+        input_frame.configure(bg=primarycolor)
+        button_frame.configure(bg=primarycolor)
+        left_button_frame.configure(bg=primarycolor)
+        right_button_frame.configure(bg=primarycolor)
+        color_btn.configure(background=offcolor)
+        run_btn.configure(background=offcolor)
+        open_file_btn.configure(background=offcolor)
+        clear_console_btn.configure(background=offcolor)
+        reset_btn.configure(background=offcolor)
+        input_label.configure(bg=primarycolor)
+        console_label.configure(bg=primarycolor)
+        newStyle.configure('My.TFrame', background=primarycolor)
+        
+       
+
+    def choose_color(self):
+        '''Function will be called when button is clicked in window'''
+        user_color_primary = colorchooser.askcolor(title='choose a PRIMARY color')
+        user_color_secondary = colorchooser.askcolor(title='choose a SECONDARY color')
+        
+        primarycolor = user_color_primary[1] #refers to the HEX value
+        offcolor = user_color_secondary[1] #hex value
+
+
+        self.change_all_colors(primarycolor, offcolor)
+
 
 class Simulator_Controller:
     '''Holds all of the GUI simulator functions'''
@@ -271,36 +302,6 @@ class Simulator_Controller:
             user_messages.config(text="Program executed sucessfully.")
         #If there was an error, an error message will already be displaying.
         
-    def change_all_colors(self, primarycolor, offcolor):
-        function_frame.configure(bg=primarycolor)
-        accumulator_frame.configure(bg=primarycolor)
-        accumulator_label.configure(bg=primarycolor)
-        accumulator_box.configure(bg=primarycolor)
-        input_frame.configure(bg=primarycolor)
-        button_frame.configure(bg=primarycolor)
-        left_button_frame.configure(bg=primarycolor)
-        right_button_frame.configure(bg=primarycolor)
-        color_btn.configure(background=offcolor)
-        run_btn.configure(background=offcolor)
-        open_file_btn.configure(background=offcolor)
-        clear_console_btn.configure(background=offcolor)
-        reset_btn.configure(background=offcolor)
-        input_label.configure(bg=primarycolor)
-        console_label.configure(bg=primarycolor)
-        newStyle.configure('My.TFrame', background=primarycolor)
-        
-       
-
-    def choose_color(self):
-        '''Function will be called when button is clicked in window'''
-        user_color_primary = colorchooser.askcolor(title='choose a PRIMARY color')
-        user_color_secondary = colorchooser.askcolor(title='choose a SECONDARY color')
-        
-        primarycolor = user_color_primary[1] #refers to the HEX value
-        offcolor = user_color_secondary[1] #hex value
-
-
-        self.change_all_colors(primarycolor, offcolor)
         
 
 
@@ -355,7 +356,7 @@ control.update_table()
 function_frame = tk.Frame(window, bg =primarycolor) 
 function_frame.pack(side='right', fill='y')
 
-color_btn = tk.Button(function_frame, text='Choose Color', font=("Courier", 20), command=sim_op.choose_color, background=offcolor)
+color_btn = tk.Button(function_frame, text='Choose Color', font=("Courier", 20), command=control.choose_color, background=offcolor)
 color_btn.pack(pady=3)
 
 accumulator_frame = tk.Frame(function_frame, background=primarycolor) #Frame containing the accumulator display
