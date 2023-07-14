@@ -105,7 +105,7 @@ class GUI_Controller:
         reg_table.selection_set(cur_row)
         reg_table.focus_set()
 
-     def change_all_colors(self, primarycolor, offcolor):
+    def change_all_colors(self, primarycolor, offcolor):
         function_frame.configure(bg=primarycolor)
         accumulator_frame.configure(bg=primarycolor)
         accumulator_label.configure(bg=primarycolor)
