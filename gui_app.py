@@ -290,8 +290,9 @@ class Simulator_Controller:
         reset_btn.configure(background=offcolor)
         input_label.configure(bg=primarycolor)
         console_label.configure(bg=primarycolor)
-
+        newStyle.configure('My.TFrame', background=primarycolor)
         
+       
 
     def choose_color(self):
         '''Function will be called when button is clicked in window'''
@@ -323,10 +324,11 @@ offcolor = "#FFFFFF" #UVU white
 primarycolor='#4C721D' #UVU green
 
 #Creates and populates the GUI register table
-register_frame = ttk.Frame(window, border=20) #Frame containing the GUI register table
+register_frame = ttk.Frame(window, border=20) #Frame containing the GUI register 
 register_frame.pack(fill='y', side=tk.LEFT)
-
-
+newStyle = ttk.Style()
+newStyle.configure('My.TFrame', background=primarycolor)
+register_frame.config(style='My.TFrame')
 
 reg_table = ttk.Treeview(register_frame, selectmode ='browse', padding=2) #GUI register table
 
@@ -404,6 +406,8 @@ run_btn = tk.Button(right_button_frame, font=("Courier", 20), command=sim_op.run
 run_btn.pack(pady=(0,7.5), side='top', padx=(7.5,0))
 clear_console_btn = tk.Button(right_button_frame, font=("Courier", 20), command=control.clear_console,text="Clear Console", border=5, width=15, bg=offcolor, fg='black') #Button to clear the console
 clear_console_btn.pack(side='bottom', pady=(7.5,0), padx=(7.5,0))
+
+
 
 
 window.mainloop() #Triggers the GUI initialization
