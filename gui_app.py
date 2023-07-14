@@ -111,7 +111,6 @@ class GUI_Controller:
         button_frame.configure(bg=primarycolor)
         left_button_frame.configure(bg=primarycolor)
         right_button_frame.configure(bg=primarycolor)
-        color_btn.configure(background=offcolor)
         run_btn.configure(background=offcolor)
         open_file_btn.configure(background=offcolor)
         clear_console_btn.configure(background=offcolor)
@@ -120,8 +119,6 @@ class GUI_Controller:
         console_label.configure(bg=primarycolor)
         newStyle.configure('My.TFrame', background=primarycolor)
         
-       
-
     def choose_color(self):
         '''Function will be called when button is clicked in window'''
         user_color_primary = colorchooser.askcolor(title='choose a PRIMARY color')
@@ -132,6 +129,15 @@ class GUI_Controller:
 
 
         self.change_all_colors(primarycolor, offcolor)
+
+    def text_window(self):
+        entry_box = Toplevel(window, background=primarycolor)
+        entry_box.geometry("850x700")
+        entry_frame = tk.Frame(entry_box, bg=primarycolor) #Frame containing console and user input
+        entry_frame.pack()
+        entry_box = tk.Text(entry_frame, wrap="word", width=100)
+        entry_box.pack(pady=(20, 0))
+
 
 
 class Simulator_Controller:
@@ -315,7 +321,8 @@ sim_op = Simulator_Controller()
 #Creates the window containing the program GUI
 window = tk.Tk()
 menubar = Menu(window)
-menubar.add_command(label="New Color", command=GUI_Controller.choose_color())
+menubar.add_command(label="New Color", command=control.choose_color)
+menubar.add_command(label="New", command=control.text_window)
 window.config(menu=menubar)
 window.title("Project Blackbox")
 window.geometry("1000x800")
@@ -358,9 +365,6 @@ control.update_table()
 #Creates all the other GUI items to the right of the GUI register table
 function_frame = tk.Frame(window, bg =primarycolor) 
 function_frame.pack(side='right', fill='y')
-
-color_btn = tk.Button(function_frame, text='Choose Color', font=("Courier", 20), command=control.choose_color, background=offcolor)
-color_btn.pack(pady=3)
 
 accumulator_frame = tk.Frame(function_frame, background=primarycolor) #Frame containing the accumulator display
 accumulator_frame.pack(side="top", pady=(20,0))
