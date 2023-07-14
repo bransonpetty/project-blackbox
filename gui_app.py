@@ -313,6 +313,9 @@ sim_op = Simulator_Controller()
 
 #Creates the window containing the program GUI
 window = tk.Tk()
+menubar = Menu(window)
+menubar.add_command(label="New Color", command=GUI_Controller.choose_color())
+window.config(menu=menubar)
 window.title("Project Blackbox")
 window.geometry("1000x800")
 window.resizable(False, False)
