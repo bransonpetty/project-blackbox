@@ -10,10 +10,17 @@ from tkinter import *
 
 class GUI_Controller:
     '''Controls most of the updates to the GUI.'''
+    file_addr = ""
+
     def load_instructions(self):
+
+        if sim_op.running_state == "running":
+            tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
+            return
 
         def open_file():
             file_path = filedialog.askopenfilename(filetypes=(("Text File (*.txt)", "*.txt"),), parent=entry_window)
+            self.file_addr = file_path
             if file_path:
                 entry_box.delete("1.0", "end")
                 with open(file_path) as input_file:
@@ -34,7 +41,8 @@ class GUI_Controller:
             self.reset_memory()
             populate_registers(loaded_instructions)
             self.refresh_table()
-            run_btn['state'] = tk.NORMAL
+            run_btn['text'] = "Run" #Changes the run button to have the run functionality
+            executemenu.entryconfigure(1, label="Run") #Changes menu button to cancel
             user_messages.config(text="Input successfully loaded.") #Informs the user that file loaded sucessfully.
             entry_window.destroy()
             
@@ -88,6 +96,7 @@ class GUI_Controller:
         
         def populate_registers(loaded_instructions):
             addr = 0
+            loaded_instructions.pop()
             for line in loaded_instructions:
                 insta.registers[addr] = line
                 addr += 1
@@ -113,42 +122,40 @@ class GUI_Controller:
         file_btn = tk.Button(entry_button_frame, command=open_file, text="Open File", font=("Courier", 20), border=5, width=15, bg=offcolor, fg='black')
         file_btn.pack(side="right", padx=30)
 
+    def save_file(self):
 
-    def open_file(self): #legacy
-        '''Opens the file and triggers the functions to prepare GUI to run script.'''
-        self.reset_memory() #Resets the memory so the new file's information can be loaded in.
-        #Opens file browser to select a txt file for instruction input.
-        file_path = filedialog.askopenfilename(filetypes=(("Text File (*.txt)", "*.txt"),))
-        error = False #Holds boolean value that determines if file was successfully loaded or not.
-        if file_path:
-            with open(file_path) as input_file:
-                addr = 0 #Current position in the register
-                for line in input_file:
-                    line = line.strip()
-                    if addr > 99: #Makes sure that only 100 registers are read from input file
-                        break
-                    elif len(line) == 5: #Correct lenght for a value with operator sign
-                        if line[0] == "+" or line[0] == "-": #Checks if operator sign is present
-                            try:
-                                _line_parse_test = int(line) #Tests if input if an integer
-                                insta.registers[addr] = line #If no errors from parsing, input is valid
-                            except: #If input is not an integer a ValueError will be triggered and an error is recorded
-                                user_messages.config(text=f'Error: {line} in your file is not a valid instruction.')
-                                error = True
-                        else: #If the first character is not a operator sign and length is 5, input is invalid
-                            user_messages.config(text=f'Error: {line} in your file is not a valid instruction.')
-                            error = True
-                    elif line == "-99999": #This means it's the end of the file.
-                        break
-                    else: #If none of the conditions above are met, the input is invalid
-                        user_messages.config(text=f'Error: {line} in your file is not a valid instruction.')
-                        error = True
-                    addr += 1 #Increments the address
-                
-            if not error: # If not errors were triggered, register table is loaded and program becames ready to run.
-                self.refresh_table()
-                run_btn['state'] = tk.NORMAL
-                user_messages.config(text="File successfully loaded.") #Informs the user that file loaded sucessfully.
+        if sim_op.running_state == "running":
+            tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
+            return
+        
+        if self.file_addr == "":
+            self.save_as()
+            return
+        else:
+            self.save_operation()
+            return
+
+    def save_as(self):
+
+        if sim_op.running_state == "running":
+            tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
+            return
+
+        savedialog = filedialog.asksaveasfile(initialfile="Instructions.txt", defaultextension=".txt", filetypes=[("Text Documents","*.txt")])
+        self.file_addr = savedialog.name
+        self.save_operation()
+
+    def save_operation(self):
+        with open(self.file_addr, "w") as save_file: #Creates a new file for the report
+            reg_end = 99
+            for i in reversed(range(100)): #Finds the last register that was used so we don't write all 100 registers to the file.
+                if insta.registers[i] != "+0000":
+                    reg_end = i
+                    break
+            for i in range(reg_end + 1): #Writes the final state of the registers to the file
+                save_file.write(insta.registers[i] + "\n")
+            save_file.write("-99999")
+        return
 
     def clear_table(self):
         '''Deletes all of the rows in the register table.'''
@@ -230,6 +237,11 @@ class GUI_Controller:
 
     def reset_memory(self):
         '''Resets the simulator and the GUI.'''
+
+        if sim_op.running_state == "running":
+            tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
+            return
+        
         for i in range(100): #Sets all the registers back to "+0000"
             insta.registers[i] = "+0000"
         insta.accumulator = '+0000' #Sets accumulator back to "+0000"
@@ -238,10 +250,14 @@ class GUI_Controller:
         insta.log = [] #Clears the logs
         self.refresh_table() #Resets the GUI register table back to default values
         self.refresh_accumulator() #Resets the GUI display of the accumulator back to default value
-        run_btn['state'] = 'disabled' #Disables the run button since no value is loaded.
 
     def clear_console(self):
         '''Clears all the console outputs.'''
+
+        if sim_op.running_state == "running":
+            tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
+            return
+        
         console_box.config(state=tk.NORMAL) #Text had to be enabled to be changed.
         console_box.delete('1.0', 'end') #Deletes all of the text in the console box.
         console_box.config(state=tk.DISABLED) #Disables the text box after modifications.
@@ -270,8 +286,6 @@ class GUI_Controller:
         accumulator_box.configure(bg=primarycolor)
         input_frame.configure(bg=primarycolor)
         button_frame.configure(bg=primarycolor)
-        left_button_frame.configure(bg=primarycolor)
-        right_button_frame.configure(bg=primarycolor)
         run_btn.configure(background=offcolor)
         open_file_btn.configure(background=offcolor)
         input_label.configure(bg=primarycolor)
@@ -292,17 +306,28 @@ class GUI_Controller:
 
 class Simulator_Controller:
     '''Holds all of the GUI simulator functions'''
+
     def __init__(self):
         self.current_addr = ''
         self.error = False
+        self.running_state = "idle"
      
     def run_cancel_control(self):
             '''Controls behavior of the run/cancel button'''
             if run_btn["text"] == 'Run': #If the program is not running the button will have its text set to "Run".
-                open_file_btn['state'] = tk.DISABLED #Disables the ability to open a new file while program is running
                 run_btn['text'] = "Cancel" #Changes the run button to have the cancel functionality
+                executemenu.entryconfigure(1, label="Cancel") #Changes menu button to cancel
                 run_btn['bg'] = 'red' #Changes button color to red
                 user_messages.config(text=f'Executing program...') #Informs the user that the program is running.
+                self.running_state = "running"
+                self.run() #Triggers the simulator run
+            elif run_btn["text"] == 'Rerun': #It will run the program again with the current registers
+                run_btn['text'] = "Cancel" #Changes the run button to have the cancel functionality
+                executemenu.entryconfigure(1, label="Cancel") #Changes menu button to cancel
+                run_btn['bg'] = 'red' #Changes button color to red
+                user_messages.config(text=f'Executing program...') #Informs the user that the program is running.
+                insta.cur_addr = 0 #Brings the program to the start
+                self.running_state = "running"
                 self.run() #Triggers the simulator run
             else: #If the button text is not "Run", it's "Cancel".
                 control.hide_input() #It will disable user input
@@ -312,6 +337,11 @@ class Simulator_Controller:
         '''Runs each line of the simulator and calls the controller for the appropriate instructions'''
         choice = True #Stops while loop if user aborts or halts
         while insta.cur_addr < 100 and choice:
+            if insta.cur_addr == 99 and insta.registers[99] == "+0000":
+                user_messages.config(text=f"Error: Entire register was executed and program was not halted.")
+                self.error = True
+                self.halt_console()
+                break
             control.highlight_reg() #Highlights the register that is currently being executed
             choice = self.controller(insta.registers[insta.cur_addr][1:3], insta.registers[insta.cur_addr][3:]) #Sends instruction code and address to controller
             insta.cur_addr += 1 #Moves to next address
@@ -385,8 +415,8 @@ class Simulator_Controller:
                 input_box.delete(0, END) #Clears the user input box
             elif user_input[0] == "-" or user_input[0] == "+": #It first checks if a operation sign is present.
                 if len(user_input) == 5: #If it is, it checks if the number is 4 digits long.
-                    user_int = int(user_input) #If it can't parse, it's not a number. A ValueError is raised.
-                    insta.console_memory = user_int #Sets the console memory to be read by the simulator read function
+                    _user_int = int(user_input) #If it can't parse, it's not a number. A ValueError is raised.
+                    insta.console_memory = user_input #Sets the console memory to be read by the simulator read function
                     insta.read(self.current_addr) #Triggers the simulator read function.
                     console_box.config(state='normal') #Text had to be enabled to be changed.
                     console_box.insert(END, f'{user_input}\n\n') #Records the user input in the console
@@ -397,7 +427,7 @@ class Simulator_Controller:
                 else: #Triggers error if there's more than 4 digits after operator sign.
                     user_messages.config(text="Invalid input. Please enter a valid positive or negative 4 digit number.")
                     input_box.delete(0, END) #Clears the user input box
-            elif user_input == "0000": #If 0000 is entered without a sign, we return it with the + sign..
+            elif int(user_input) == 0: #If 0000 is entered without a sign, we return it with the + sign..
                 insta.console_memory = f"+0000" #We add the plus sign and add it to the console memory.
                 insta.read(self.current_addr) #Triggers the simulator read function
                 console_box.config(state='normal') #Text had to be enabled to be changed.
@@ -445,17 +475,14 @@ class Simulator_Controller:
         console_box.see(END) #Scrolls the console down
         console_box.config(state='disabled') #Disables the text box after modifications.
         #Enables the Open file, Reset Memory, and Clear Console buttons after program execution.
-        open_file_btn['state'] = tk.NORMAL
         #Sets the "Cancel" button back to "Run" functionality
-        run_btn["text"] = "Run"
+        run_btn["text"] = "Rerun"
+        executemenu.entryconfigure(1, label="Rerun") #Changes menu button to rerun
         run_btn['bg'] = 'dodgerblue3'
-        run_btn['state'] = 'disabled' #Keeps it disabled until new file is opened
+        self.running_state = "idle"
         if self.error == False: #If not errors on halting, informs the user that program executed sucessfully
             user_messages.config(text="Program executed sucessfully.")
         #If there was an error, an error message will already be displaying.
-        
-        
-
 
 '''Initial GUI render'''
 
@@ -469,8 +496,8 @@ window = tk.Tk()
 menubar = Menu(window)
 filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Load instructions", command=control.load_instructions)
-filemenu.add_command(label="Save")
-filemenu.add_command(label="Save as...")
+filemenu.add_command(label="Save", command=control.save_file)
+filemenu.add_command(label="Save as...", command=control.save_as)
 menubar.add_cascade(label="File", menu=filemenu)
 executemenu = Menu(menubar, tearoff=0)
 executemenu.add_command(label="Run", command=sim_op.run_cancel_control)
@@ -484,7 +511,6 @@ window.config(menu=menubar)
 window.title("Project Blackbox")
 window.geometry("1000x800")
 window.resizable(False, False)
-#window.configure(bg='green')
 offcolor = "#FFFFFF" #UVU white
 primarycolor='#4C721D' #UVU green
 
@@ -559,7 +585,7 @@ button_frame.pack(side='bottom', anchor='c', fill='y', pady=(0, 70))
 
 open_file_btn = tk.Button(button_frame, text="Open File", font=("Courier", 20), command=control.load_instructions, border=5, width=15, bg=offcolor, fg='black') #Button to open file
 open_file_btn.pack(side='top', pady=(0, 10))
-run_btn = tk.Button(button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=15, bg=offcolor, fg='black', state='disabled') #Button to run and cancel the program execution, can use disabledforeground to make text more readable in needed
+run_btn = tk.Button(button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=15, bg=offcolor, fg='black') #Button to run and cancel the program execution, can use disabledforeground to make text more readable in needed
 run_btn.pack(side='bottom', pady=(10, 0))
 
 window.mainloop() #Triggers the GUI initialization
