@@ -577,9 +577,9 @@ user_messages.pack(pady=(0, 10))
 button_frame = tk.Frame(function_frame, background=primarycolor) #Frame containing all the buttons
 button_frame.pack(side='bottom', anchor='c', fill='y', pady=(0, 70))
 
-open_file_btn = tk.Button(button_frame, text="Open File", font=("Courier", 20), command=control.load_instructions, border=5, width=15, bg=offcolor, fg='black') #Button to open file
+open_file_btn = tk.Button(button_frame, text="Load Instructions", font=("Courier", 20), command=control.load_instructions, border=5, width=20, bg=offcolor, fg='black') #Button to open file
 open_file_btn.pack(side='top', pady=(0, 10))
-run_btn = tk.Button(button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=15, bg=offcolor, fg='black') #Button to run and cancel the program execution, can use disabledforeground to make text more readable in needed
+run_btn = tk.Button(button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=20, bg=offcolor, fg='black') #Button to run and cancel the program execution, can use disabledforeground to make text more readable in needed
 run_btn.pack(side='bottom', pady=(10, 0))
 
 window.mainloop() #Triggers the GUI initialization
