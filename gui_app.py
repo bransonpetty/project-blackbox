@@ -42,7 +42,6 @@ class GUI_Controller:
             executemenu.entryconfigure(1, label="Run") #Changes menu button to cancel
             user_messages.config(text="Input successfully loaded.") #Informs the user that file loaded sucessfully.
             entry_window.destroy()
-            
         
         def validate_input_size():
             line_list = []
@@ -98,7 +97,6 @@ class GUI_Controller:
                 insta.registers[addr] = line
                 addr += 1
 
-        
         entry_window = Toplevel(window, background=primarycolor)
         entry_window.geometry("850x700")
         entry_frame = tk.Frame(entry_window, bg=primarycolor)
@@ -181,7 +179,6 @@ class GUI_Controller:
             insta.registers[old_values[0]] = formatted_input
             self.refresh_table()
             reg_window.destroy()
-            
 
         def validate_input(user_input):
             try:
@@ -209,8 +206,7 @@ class GUI_Controller:
             else: #If none of the conditions above are met, the input is invalid
                 tk.messagebox.showerror("Invalid input", "Invalid Input", parent=reg_window)
                 return (False, "Fail")
-
-
+            
         item_id = event.widget.focus()
         item = event.widget.item(item_id)
         old_values = item['values']
@@ -264,7 +260,6 @@ class GUI_Controller:
         input_box['state'] = "normal"
         submit_input['state'] = 'normal'
 
-
     def hide_input(self):
         '''Disables the user input box and the submit button.'''
         input_box['state'] = "disabled"
@@ -296,7 +291,6 @@ class GUI_Controller:
         
         primarycolor = user_color_primary[1] #refers to the HEX value
         offcolor = user_color_secondary[1] #hex value
-
 
         self.change_all_colors(primarycolor, offcolor)
 
