@@ -568,8 +568,8 @@ input_box.pack(pady = (0, 10))
 submit_input = tk.Button(input_frame, text="Submit Input", font=("Arial", 10), state='disabled', command=sim_op.submit_input, fg='black', bg=offcolor) #Input submit button
 submit_input.pack(pady = (0, 10))
 
-user_messages = tk.Label(input_frame, font=("Arial", 15), text="Select a instruction file to execute.", wraplength="400", activebackground=primarycolor) #Text for messages directed to the user.
-user_messages.pack(pady=(0, 10))
+user_messages = tk.Label(input_frame, font=("Arial", 15), text="Load instructions to execute.", wraplength="400", bg=primarycolor) #Text for messages directed to the user.
+user_messages.pack(pady=(5, 10))
 
 button_frame = tk.Frame(function_frame, background=primarycolor) #Frame containing all the buttons
 button_frame.pack(side='bottom', anchor='c', fill='y', pady=(0, 70))
