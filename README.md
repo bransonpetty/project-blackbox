@@ -47,9 +47,13 @@ Once the registers are loaded as desired you may execute the instructions by pre
 
 ![Run Button](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Run%20Button.png)
 
----CANCEL---
+While the program is executing, a new button will appear that will allow you to abort the execution:
 
----RERUN---
+![Cancel Button](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Cancel%20button.png)
+
+Once the program execution is completed, you will be given the option to rerun the program by pressing the button shown bellow (Just keep in mind that the program will run with all the modifications made during the previous execution):
+
+![Rerun Button](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Rerun%20button.png)
 
 In the top of the window you will find a "File" menu that can be used to load the instructions or save the register instructions to a txt file:
 
@@ -57,10 +61,16 @@ In the top of the window you will find a "File" menu that can be used to load th
 
 Next to the "File" menu you will find the "Execution menu" that can be used to run/cancel/rerun program, reset all the register to 0, and clear the console:
 
-![Execution Menu](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Execute%20menu.png)
+![Execution Menu](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Execution%20menu.png)
 
----STYLE---
+If you wish to change the color scheme of the program, you may click on the "Change Color Scheme" under the Style menu. Once you select the option, you will be able to choose a primary color (color of the background) as shown bellow:
 
-File should include a 4 digit operator on each line. The filename
-argument can be placed immediately after the run statement, or
-after the run statement a prompt will display.
+![Primary Color](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Select%20Primary.png)
+
+Then you will be able to choose a secondary color (color of the buttons) as shown bellow:
+
+![Seconday Color](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Select%20Secondary.png)
+
+After selecting both colors, the color scheme of the program will be modified as shown bellow:
+
+![New Style](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Style%20result.png)
