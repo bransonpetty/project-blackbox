@@ -34,6 +34,33 @@ You can load the instructions buy pressing the "Load Instruction" button as show
 
 ![Load Instruction(Button)](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Load%20instruction%20(button).png)
 
+Once you select "Load Instructions", a new window will appear as shown bellow. In this new window you may load the instructions from a file or enter them manually buy entering all of the instructions in the text box in the window. If you decide to open a file, you will be given the change to modify the instructions before loading them to the registers by pressing "Process Entry":
+
+![Load Instruction(Window)](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Load%20instruction%20(window).png)
+
+Once the instructions successfully loaded, they will be displayed the table shown in the first image bellow. At this point, you may double click any of the register entry in the table to edit it. Once you double click it, the window shown in the second image bellow will appear and you may enter the new value to be stored in the register:
+
+![Registers](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Registers.png)
+![Registers (Double Click)](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Edit%20register.png)
+
+Once the registers are loaded as desired you may execute the instructions by pressing the Run button as shown bellow:
+
+![Run Button](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Run%20Button.png)
+
+---CANCEL---
+
+---RERUN---
+
+In the top of the window you will find a "File" menu that can be used to load the instructions or save the register instructions to a txt file:
+
+![File Menu](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/File%20menu.png)
+
+Next to the "File" menu you will find the "Execution menu" that can be used to run/cancel/rerun program, reset all the register to 0, and clear the console:
+
+![Execution Menu](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Execute%20menu.png)
+
+---STYLE---
+
 File should include a 4 digit operator on each line. The filename
 argument can be placed immediately after the run statement, or
 after the run statement a prompt will display.
