@@ -33,11 +33,5 @@ then running the command bellow:
 ```shell
 python gui_app.py
 ```
-Example: python main.pt file.txt
-
-You may also opt to simply run the program without the file name. In this case, the program will
-simply prompt you to input the file name with extension before running. Example bellow:
-
- ```shell
-python main.py
-```
+Once you execute the command above, a GUI will be open to the screen that can be used to execute any amount
+of BasicML scripts.
