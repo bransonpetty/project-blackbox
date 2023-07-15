@@ -30,7 +30,9 @@ python gui_app.py
 Once you execute the command above, a GUI will be open to the screen that can be used to execute any amount
 of BasicML scripts.
 
+You can load the instructions buy pressing the "Load Instruction" button as shown bellow or in the "File" menu on the top of the program:
 
+![Load Instruction(Button)](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Load%20instruction%20(button).png)
 
 File should include a 4 digit operator on each line. The filename
 argument can be placed immediately after the run statement, or
