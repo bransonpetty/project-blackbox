@@ -138,6 +138,9 @@ is read.
 ## Use Cases: 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 393730b (Update design-doc.md)
 - ADD (30xx) - We load the number 8 from a register and add it to the accumulator which has the value
     6 in it previously. Once the operation has finished the accumulator will have a value of 14
 - SUBTRACT (31xx) - We load the number 2 from a register and subtract it from the accumulator value of
@@ -155,6 +158,7 @@ is read.
 - BRANCH (40xx) - The second two digits provide a location to jump to. So when the command is
   encountered the current register changes to whatever is specified by the two digits.
 - HALT (43xx) - When encountered processes are paused and the program stops running
+<<<<<<< HEAD
 =======
 - ADD (30xx) - Identify 2 digit function code. Reference register specified in the last two digits
     of the direction. Add that registers value to the accumulator's existing value.
@@ -178,5 +182,8 @@ is read.
 - Using READ and WRITE we can echo a users input by returning the value immediately following it's input.
     We will store the value in a register and then use that register in the write command.
 - BRANCHNEG can be used for conditionals by altering the accumulator value based off a logic statement.
+=======
+
+>>>>>>> 393730b (Update design-doc.md)
 
 >>>>>>> 03ce6e1 (Fixed Design-Doc)
