@@ -104,33 +104,31 @@ Make sure all the instructions are stored on a *.txt file.
 ## User Stories:
 
 - Brian has taken an interest in computer science and wants to understand at a base level how assembly
-instructions work. He is able to write short instruction files to learn how each of them work and 
-eventually how to preform multiple successive functions.
+instructions work. He is able to write short instruction files to learn how each of them works and 
+eventually how to perform multiple successive functions.
 
 - Justin is designing a program on his raspberry pi. Because the raspberry pi doesn't have much in the
-way of memory he needs to design a program at the lowest level to improve memory and preformance. 
-For easier testing than running his long instruction programs on his raspberry pi he is able to run
+way of memory he needs to design a program at the lowest level to improve memory and performance. 
+For easier testing than running his long instruction programs on his raspberry pi, he is able to run
 this program from his computer and use the debugger to watch each register as a line of instruction
 is read.
 
 ## Use Cases: 
 
 - ADD (30xx) - We load the number 8 from a register and add it to the accumulator which has the value
-    6 in it previously. Once the operation has finished the accumulator will have the value of 14
-- SUBTRACT (31xx) - We load the number 2 from a register and subract it from the accumulator value of
+    6 in it previously. Once the operation has finished the accumulator will have a value of 14
+- SUBTRACT (31xx) - We load the number 2 from a register and subtract it from the accumulator value of
     5 leaving the accumulator with a value of 3.
-- Using READ and MULTIPLY together the program can take a value from the user and load it into a 
-    register that can then be multiplyed by the accumulator value.
-- Using BRANCHNEG we can check the accumulator for a negative value. If the accumulator is negative
-    value we can issue a HALT command to branch to so the program quits.
-- Using READ and LOAD we can manually set the accumulator value by reading the user input into a 
-    register that LOAD can then reference to manually set the accumulator value.
-- The STORE operation can be used to copy the accumulator value into a register. This can be used to
-    temporarily alter the value and revert back using LOAD.
-- After preforming an arithmetic operation we want to return the value so we will use the LOAD and 
-    WRITE functions to pull the value from the accumulator into a register and then write it to the console.
-- Using READ and WRITE we can echo a users input by returning the value immediately following it's input.
-- BRANCH, BRANCHNEG, and BRANCHZERO can be used for loops and conditionals by altering the accumulator
-    value.
-- Using READ and DIVIDE we can take the user input and divide the accumulator value by the user input.
-
+- READ (10xx) - We load the inputted number from the user input. The number is then saved to the
+  register specified in the second two digits of the command.
+- WRITE (11xx) - We load the number specified in the given register. The value is then placed as
+  the output in the console.
+- DIVIDE (32xx) - We load the number 10 from the accumulator and divide it by (2) the number in the
+  specified register. The result (5) is then stored in the accumulator.
+- MULTIPLY (33xx) - We load the number 3 from the accumulator and divide it by (3) the number in the
+  specified register. The result (9) is then stored in the accumulator.
+- LOAD (20xx) - We load the given register value and copy it into the accumulator.
+- STORE (21xx) - We load the value in the accumulator and copy it into the specified register.
+- BRANCH (40xx) - The second two digits provide a location to jump to. So when the command is
+  encountered the current register changes to whatever is specified by the two digits.
+- HALT (43xx) - When encountered processes are paused and the program stops running
