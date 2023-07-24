@@ -4,7 +4,7 @@ Project Blackbox
 Designed and built by: Branson Petty, Connor Barry, Noah Potter, and Pedro Valente.
 
 The purpose of this program is to create a functional assembly program that reads an instruction file
-line by line. Executing commands and utilizing 100 registers as virtual memory that each store signed 
+line by line. Executing commands and utilizing 250 registers as virtual memory that each store signed 
 4 digit numbers, referred to as words, and the each of the operations.
 
 The program was designed to only run .txt files. This decision was made to assure maximum accuracy
@@ -47,7 +47,7 @@ class Simulator:
         self.instructions = ["00", "10", "11", "20", "21", "30", "31", "32", "33", "40", "41", "42", "43"] #Lists all the valid instructions
         self.log = [] #Creates a log list of all the operations
 
-        for i in range(100): #Creates the registers using a dictionary
+        for i in range(250): #Creates the 250 registers using a dictionary
             self.registers[i] = "+0000"
         
     '''I/O operations'''
