@@ -57,8 +57,8 @@ class GUI_Controller:
                         line_list.append(line[0:-1])
                     elif line == "":
                         break
-            if len(line_list) > 100:
-                entry_message.config(text="Error: Your input contain more than 100 instructions.")
+            if len(line_list) > 250: #max line limit 250
+                entry_message.config(text="Error: Your input contain more than 250 instructions.")
                 return (False, [])
             else:
                 return (True, line_list)
@@ -149,7 +149,7 @@ class GUI_Controller:
     def save_operation(self):
         with open(self.file_addr, "w") as save_file: #Creates a new file for the report
             reg_end = 99
-            for i in reversed(range(100)): #Finds the last register that was used so we don't write all 100 registers to the file.
+            for i in reversed(range(250)): #Finds the last register that was used so we don't write all 250 registers to the file.
                 if insta.registers[i] != "+0000":
                     reg_end = i
                     break
@@ -241,7 +241,7 @@ class GUI_Controller:
             tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
             return
         
-        for i in range(100): #Sets all the registers back to "+0000"
+        for i in range(250): #Sets all the registers back to "+0000"
             insta.registers[i] = "+0000"
         insta.accumulator = '+0000' #Sets accumulator back to "+0000"
         insta.cur_addr = 0 #Sets the memory pointer back to the first register
@@ -334,8 +334,8 @@ class Simulator_Controller:
     def run(self):
         '''Runs each line of the simulator and calls the controller for the appropriate instructions'''
         choice = True #Stops while loop if user aborts or halts
-        while insta.cur_addr < 100 and choice:
-            if insta.cur_addr == 99 and insta.registers[99] == "+0000":
+        while insta.cur_addr < 250 and choice:
+            if insta.cur_addr == 249 and insta.registers[249] == "+0000": #this was 99 before
                 user_messages.config(text=f"Error: Entire register was executed and program was not halted.")
                 self.error = True
                 self.halt_console()
