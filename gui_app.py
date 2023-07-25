@@ -4,9 +4,7 @@ from tkinter import filedialog
 from tkinter import colorchooser
 from tkinter import *
 from simulator import Simulator
-from tkinter import filedialog
-from tkinter import colorchooser
-from tkinter import *
+import subprocess
 
 class GUI_Controller:
     '''Controls most of the updates to the GUI.'''
@@ -484,6 +482,9 @@ class Simulator_Controller:
 
 '''Initial GUI render'''
 
+def new_window():
+    subprocess.run(["python", "gui_app.py"])
+
 #Initiates all of the class instances
 insta = Simulator()
 control = GUI_Controller()
@@ -496,6 +497,7 @@ filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Load instructions", command=control.load_instructions)
 filemenu.add_command(label="Save", command=control.save_file)
 filemenu.add_command(label="Save as...", command=control.save_as)
+filemenu.add_command(label="Open new instance", command=new_window)
 menubar.add_cascade(label="File", menu=filemenu)
 executemenu = Menu(menubar, tearoff=0)
 executemenu.add_command(label="Run", command=sim_op.run_cancel_control)
