@@ -3,7 +3,7 @@
 Designed and built by: Branson Petty, Connor Barry, Noah Potter, and Pedro Valente.
 
 The purpose of this program is to create a functional assembly program that reads an instruction file
-line by line. Executing commands and utilizing 100 registers as virtual memory that each store signed 
+line by line. Executing commands and utilizing 250 registers as virtual memory that each store signed 
 4 digit numbers, referred to as words, and the each of the operations.
 
 The program was designed to only run .txt files. This decision was made to assure maximum accuracy
