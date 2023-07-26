@@ -156,7 +156,7 @@ class GUI_Controller:
 
     def save_operation(self):
         with open(self.file_addr, "w") as save_file: #Creates a new file for the report
-            reg_end = 99
+            reg_end = 249 #changed from 99
             for i in reversed(range(250)): #Finds the last register that was used so we don't write all 250 registers to the file.
                 if insta.registers[i] != "+0000":
                     reg_end = i
