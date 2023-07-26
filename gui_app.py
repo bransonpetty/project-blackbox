@@ -5,11 +5,13 @@ from tkinter import colorchooser
 from tkinter import *
 from simulator import Simulator
 import subprocess
+import os
 
 class GUI_Controller:
     '''Controls most of the updates to the GUI.'''
     def __init__(self):
         self.file_addr = ""
+        self.temp_file = "./temp.txt"
         self.offcolor = "#FFFFFF" #UVU white
         self.primarycolor='#4C721D' #UVU green
 
@@ -29,7 +31,15 @@ class GUI_Controller:
                     entry_box.insert(END, temp_text)
 
         def process():
-            with open("./temp.txt", "w") as temp:
+            if not os.path.exists(self.temp_file):
+                count = 1
+                success = True
+                while not success:
+                    possible_filename = f"./temp{count}.txt"
+                    success = os.path.exists(possible_filename)
+                self.temp_file = possible_filename
+                  
+            with open(self.temp_file, "w") as temp:
                 temp.write(entry_box.get("1.0", END))
             size_out = validate_input_size()
             size_check = size_out[0]
@@ -49,7 +59,7 @@ class GUI_Controller:
         
         def validate_input_size():
             line_list = []
-            with open("./temp.txt", "r") as temp:
+            with open(self.temp_file, "r") as temp:
                 for line in temp:
                     if line != "":
                         line_list.append(line[0:-1])
@@ -483,7 +493,7 @@ class Simulator_Controller:
 '''Initial GUI render'''
 
 def new_window():
-    subprocess.run(["python", "gui_app.py"])
+    subprocess.Popen(["python", "gui_app.py"])
 
 #Initiates all of the class instances
 insta = Simulator()
