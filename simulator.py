@@ -83,7 +83,7 @@ class Simulator:
         elif result == 0:
             self.accumulator = "+000000"
         else:
-            self.accumulator = f"{str(result).zfill(6)}" #changing this to be a 6, lets see what happens
+            self.accumulator = f"{str(result).zfill(7)}" #changing this to be a 6, lets see what happens
         return True
 
     def subtract(self, addr):
@@ -98,7 +98,7 @@ class Simulator:
         elif result == 0:
             self.accumulator = "+000000"
         else:
-            self.accumulator = f"{str(result).zfill(6)}"#changing this to be a 6, lets see what happens
+            self.accumulator = f"{str(result).zfill(7)}"#changing this to be a 6, lets see what happens
         return True
 
     def divide(self, addr):
@@ -113,7 +113,7 @@ class Simulator:
         elif result == 0:
             self.accumulator = "+000000"
         else:
-            self.accumulator = f"{str(result).zfill(6)}"#changing this to be a 6, lets see what happens
+            self.accumulator = f"{str(result).zfill(7)}"#changing this to be a 6, lets see what happens
         return True
 
     def multiply(self, addr):
@@ -127,7 +127,7 @@ class Simulator:
         elif result == 0:
             self.accumulator = "+000000"
         else:
-            self.accumulator = f"{str(result).zfill(6)}" #changing this to be a 6, lets see what happens
+            self.accumulator = f"{str(result).zfill(7)}" #changing this to be a 6, lets see what happens
         return True
     
     
