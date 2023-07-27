@@ -28,16 +28,18 @@ def test_read_success():
 def test_write_success():
     '''Tests if function successfully writes word to screen'''
     temp = Simulator()
-    temp.registers[0] = "+1000"
-    temp.write("00")
-    out, err = capfd.readouterr() #Captures what is printed to the console
-    assert out[:5] == "+1000" #Had to specify that it's the 5 first digits as it also captures the newline character (\n)
+    temp.registers[0] = "+010000"
+    temp.write("000")
+    assert temp.console_memory == "+010000" #Had to specify that it's the 5 first digits as it also captures the newline character (\n)
 
 '''TEST FOR "load" INSTRUCTION FUNCTION'''
 
 def test_load_success():
     '''Tests if function successfully loads word from register to the accumulator'''
     temp = Simulator()
+    temp.registers[0] = "+010000"
+    temp.load("000")
+    assert temp.accumulator == "+010000"
     temp.registers[0] = "+010000"
     temp.load("000")
     assert temp.accumulator == "+010000"
