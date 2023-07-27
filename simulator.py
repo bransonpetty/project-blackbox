@@ -106,7 +106,6 @@ class Simulator:
         result = int(self.accumulator) // int(self.registers[int(addr)]) #Divides the word in the accumulator by the word from the register.
         #NO DIVISION OPERATION SHOULD RESULT IN OVERFLOW, I'M STILL LEAVING THIS HERE IN CASE THERE IS ANY ABNORMALITY I DIDN'T PREDICT.
         if result > 999999 or result < -999999: #Checks if the result is too large to be stored in the accumulator.
-            print(f"Overflow error on division in address {addr}.\nThe result is too large to be stored in the accumulator. The program will now be terminated.")
             return False
         #The following elif and else statements format the result to be stored in the accumulator.
         elif result > 0:
@@ -121,7 +120,6 @@ class Simulator:
         '''Multiplies a word from a specific location in memory to the word in the accumulator (leaves the result in the accumulator).'''
         result = int(self.accumulator) * int(self.registers[int(addr)]) #Multiplies the word in the accumulator by the word from the register.
         if result > 999999 or result < -999999: #Checks if the result is too large to be stored in the accumulator.
-            print(f"Overflow error on multiplication in address {addr}.\nThe result is too large to be stored in the accumulator. The program will now be terminated.")
             return False
         #The following elif and else statements format the result to be stored in the accumulator.
         elif result > 0:
