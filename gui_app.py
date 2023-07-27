@@ -83,14 +83,14 @@ class GUI_Controller:
                 except: #If input is not an integer a ValueError will be triggered and an error is recorded
                     entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
                     return False
-                if len(line) == 5: #Correct lenght for a value with operator sign
+                if len(line) == 7: #Correct lenght for a value with operator sign
                     if line[0] == "+" or line[0] == "-": #Checks if operator sign is present
                         line_count += 1
                         continue #If no errors from parsing, input is valid
                     else: #If the first character is not a operator sign and length is 5, input is invalid
                         entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
                         return False
-                elif len(line) == 4:
+                elif len(line) == 6:
                     if line[0] == "+" or line[0] == "-": #If operator sign is present, this is a 3 digit number, which is invalid
                         entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
                         return False
@@ -137,7 +137,7 @@ class GUI_Controller:
         reg_end = 249
         for i in reversed(range(250)): #Finds the last register that was used so we don't write all 100 registers to the file.
             reg_end = i
-            if insta.registers[i] != "+0000":
+            if insta.registers[i] != "+000000":
                 reg_end
                 break
         if reg_end != 0:
@@ -173,7 +173,7 @@ class GUI_Controller:
         with open(self.file_addr, "w") as save_file: #Creates a new file for the report
             reg_end = 249 #changed from 99
             for i in reversed(range(250)): #Finds the last register that was used so we don't write all 250 registers to the file.
-                if insta.registers[i] != "+0000":
+                if insta.registers[i] != "+000000":
                     reg_end = i
                     break
             for i in range(reg_end): #Writes the final state of the registers to the file
@@ -228,7 +228,7 @@ class GUI_Controller:
                 else: #If the first character is not a operator sign and length is 4, input is valid
                     return (True, f"+{user_input}")
             elif int(user_input) == 0:
-                return (True, "+0000")
+                return (True, "+000000")
             elif user_input == "":
                 tk.messagebox.showerror("No input", "Input is empty, please enter a 4 digit number with an operator.", parent=reg_window)
                 return (False, "Fail")
@@ -265,8 +265,8 @@ class GUI_Controller:
             return
         
         for i in range(250): #Sets all the registers back to "+0000"
-            insta.registers[i] = "+0000"
-        insta.accumulator = '+0000' #Sets accumulator back to "+0000"
+            insta.registers[i] = "+000000"
+        insta.accumulator = '+000000' #Sets accumulator back to "+0000"
         insta.cur_addr = 0 #Sets the memory pointer back to the first register
         insta.console_memory = "" #Clears the console memory
         insta.log = [] #Clears the logs
@@ -325,7 +325,8 @@ class GUI_Controller:
         self.change_all_colors()
 
     def terminate(self):
-        os.remove(self.temp_file)
+        if os.path.exists(self.temp_file):
+            os.remove(self.temp_file)
         window.destroy()
 
 
@@ -362,13 +363,13 @@ class Simulator_Controller:
         '''Runs each line of the simulator and calls the controller for the appropriate instructions'''
         choice = True #Stops while loop if user aborts or halts
         while insta.cur_addr < 250 and choice:
-            if insta.cur_addr == 249 and insta.registers[249] == "+0000": #this was 99 before
+            if insta.cur_addr == 249 and insta.registers[249] == "+000000": #this was 99 before
                 user_messages.config(text=f"Error: Entire register was executed and program was not halted.")
                 self.error = True
                 self.halt_console()
                 break
             control.highlight_reg() #Highlights the register that is currently being executed
-            choice = self.controller(insta.registers[insta.cur_addr][1:3], insta.registers[insta.cur_addr][3:]) #Sends instruction code and address to controller
+            choice = self.controller(insta.registers[insta.cur_addr][1:4], insta.registers[insta.cur_addr][4:]) #Sends instruction code and address to controller
             insta.cur_addr += 1 #Moves to next address
         return
 
@@ -381,37 +382,37 @@ class Simulator_Controller:
             self.error = True #Informs the GUI halt operations that the program wasn't executed properly
             self.halt_console() #Triggers the GUI halt operations
             choice = insta.halt() #Halts the program by setting choice to False
-        elif instruction == "00":
+        elif instruction == "000":
             choice = True #Skips empty registers
-        elif instruction == "10":
+        elif instruction == "010":
             choice = self.read_console(addr) 
-        elif instruction == "11":
+        elif instruction == "011":
             choice = self.console_write(addr)
-        elif instruction == "20":
+        elif instruction == "020":
             choice = insta.load(addr)
             control.refresh_accumulator() #Updates the accumulator after operation
-        elif instruction == "21":
+        elif instruction == "021":
             choice = insta.store(addr)
             control.refresh_table()
-        elif instruction == "30":
+        elif instruction == "030":
             choice = insta.add(addr)
             control.refresh_accumulator() #Updates the accumulator after operation
-        elif instruction == "31":
+        elif instruction == "031":
             choice = insta.subtract(addr)
             control.refresh_accumulator() #Updates the accumulator after operation
-        elif instruction == "32":
+        elif instruction == "032":
             choice = insta.divide(addr)
             control.refresh_accumulator() #Updates the accumulator after operation
-        elif instruction == "33":
+        elif instruction == "033":
             choice = insta.multiply(addr)
             control.refresh_accumulator() #Updates the accumulator after operation
-        elif instruction == "40":
+        elif instruction == "040":
             choice = insta.branch(addr)
-        elif instruction == "41":
+        elif instruction == "041":
             choice = insta.branch_neg(addr)
-        elif instruction == "42":
+        elif instruction == "042":
             choice = insta.branch_zero(addr)
-        elif instruction == "43":
+        elif instruction == "043":
             choice = insta.halt()
             self.halt_console() #Triggers the GUI halt operations
 
@@ -421,7 +422,7 @@ class Simulator_Controller:
         '''Prepares GUI to accept user input.'''
         self.current_addr = addr #Stores the current address to be used by submit_input function
         console_box.config(state='normal') #Text had to be enabled to be changed.
-        console_box.insert(END, f'Enter a positive or negative 4 digit number into memory register {addr}, then press the submit button (ex: +1234 or -4321): ')
+        console_box.insert(END, f'Enter a positive or negative 6 digit number into memory register {addr}, then press the submit button (ex: +1234 or -4321): ')
         console_box.see(END) #Scrolls the console down
         console_box.config(state='disabled') #Disables the text box after modifications.
         control.show_input() #Enables the user input
@@ -439,7 +440,7 @@ class Simulator_Controller:
                 user_messages.config(text="No input. Please enter a valid positive or negative 4 digit number.")
                 input_box.delete(0, END) #Clears the user input box
             elif user_input[0] == "-" or user_input[0] == "+": #It first checks if a operation sign is present.
-                if len(user_input) == 5: #If it is, it checks if the number is 4 digits long.
+                if len(user_input) == 7: #If it is, it checks if the number is 6 digits long with sign.
                     _user_int = int(user_input) #If it can't parse, it's not a number. A ValueError is raised.
                     insta.console_memory = user_input #Sets the console memory to be read by the simulator read function
                     insta.read(self.current_addr) #Triggers the simulator read function.
@@ -450,19 +451,19 @@ class Simulator_Controller:
                     input_box.delete(0, END) #Clears the user input
                     success = True #Sets success to true to inform program that execution was sucessfull.
                 else: #Triggers error if there's more than 4 digits after operator sign.
-                    user_messages.config(text="Invalid input. Please enter a valid positive or negative 4 digit number.")
+                    user_messages.config(text="Invalid input. Please enter a valid positive or negative 6 digit number.")
                     input_box.delete(0, END) #Clears the user input box
-            elif int(user_input) == 0: #If 0000 is entered without a sign, we return it with the + sign..
-                insta.console_memory = f"+0000" #We add the plus sign and add it to the console memory.
+            elif int(user_input) == 0: #If 000000 is entered without a sign, we return it with the + sign..
+                insta.console_memory = f"+000000" #We add the plus sign and add it to the console memory.
                 insta.read(self.current_addr) #Triggers the simulator read function
                 console_box.config(state='normal') #Text had to be enabled to be changed.
-                console_box.insert(END, f'+0000\n\n') #Records the user input in the console
+                console_box.insert(END, f'+000000\n\n') #Records the user input in the console
                 console_box.see(END) #Scrolls the console down
                 console_box.config(state='disabled') #Disables the text box after modifications.
                 input_box.delete(0, END) #Clears the user input
                 success = True #Sets success to true to inform program that execution was sucessfull.
-            elif len(user_input) == 4:
-                user_int = int(user_input) #if it's 4 digits long and it can parse, it's a valid positive number.
+            elif len(user_input) == 6:
+                _user_int = int(user_input) #if it's 4 digits long and it can parse, it's a valid positive number.
                 insta.console_memory = f"+{user_input}" #We add the plus sign and add it to the console memory.
                 insta.read(self.current_addr) #Triggers the simulator read function
                 console_box.config(state='normal') #Text had to be enabled to be changed.
@@ -472,10 +473,10 @@ class Simulator_Controller:
                 input_box.delete(0, END) #Clears the user input
                 success = True #Sets success to true to inform program that execution was sucessfull.
             else: #Triggers an error if none of the conditions above are met.
-                user_messages.config(text="Invalid input. Please enter a valid positive or negative 4 digit number.")
+                user_messages.config(text="Invalid input. Please enter a valid positive or negative 6 digit number.")
                 input_box.delete(0, END) #Clears the user input
         except ValueError: #If number fails to parse, it will trigger this error
-            user_messages.config(text="Invalid input. Please enter a valid positive or negative 4 digit number.")
+            user_messages.config(text="Invalid input. Please enter a valid positive or negative 6 digit number.")
             input_box.delete(0, END)
 
         if success: #If operation is sucessfully executed, program continues to run
@@ -585,7 +586,7 @@ accumulator_frame.pack(side="top", pady=(20,0))
 
 accumulator_label = tk.Label(accumulator_frame, text="Accumulator: ", font=("Arial", 20), bg=control.primarycolor) #Accumulator title
 accumulator_label.pack(side="left")
-accumulator_box = tk.Entry(accumulator_frame, font=("Arial", 20), width=6, bg=control.primarycolor) #Accumulator display
+accumulator_box = tk.Entry(accumulator_frame, font=("Arial", 20), width=8, bg=control.primarycolor) #Accumulator display
 accumulator_box.pack(side="right")
 
 accumulator_box.insert(END, insta.accumulator) #Populates the accumulator
