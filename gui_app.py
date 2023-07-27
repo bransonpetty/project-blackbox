@@ -34,9 +34,11 @@ class GUI_Controller:
             if not os.path.exists(self.temp_file):
                 count = 1
                 success = True
-                while not success:
+                possible_filename = ''
+                while success:
                     possible_filename = f"./temp{count}.txt"
                     success = os.path.exists(possible_filename)
+                    count += 1
                 self.temp_file = possible_filename
                   
             with open(self.temp_file, "w") as temp:
@@ -49,6 +51,8 @@ class GUI_Controller:
             instruction_check = validate_instructions(loaded_instructions)
             if not instruction_check:
                 return
+            while loaded_instructions[-1] == '':
+                loaded_instructions.pop()
             self.reset_memory()
             populate_registers(loaded_instructions)
             self.refresh_table()
@@ -95,18 +99,17 @@ class GUI_Controller:
                         continue #If no errors from parsing, input is valid
                 elif line == "-99999": #This means it's the end of the file.
                     return True
-                elif line == "":
-                    entry_message.config(text=f'Error(line {line_count}): Your input must not have empty lines between instructions and must end with "-99999".')
-                    return False
+                elif line == "": #This is the last instruction
+                    return True
                 else: #If none of the conditions above are met, the input is invalid
                     entry_message.config(text=f'Error: {line} in your input is not a valid instruction.')
                     return False
-            entry_message.config(text=f'Error(line {line_count}): Your input must end with "-99999".')
-            return False
+            return True
         
         def populate_registers(loaded_instructions):
             addr = 0
-            loaded_instructions.pop()
+            if loaded_instructions[-1] == "-99999":
+                loaded_instructions.pop()
             for line in loaded_instructions:
                 insta.registers[addr] = line
                 addr += 1
@@ -130,6 +133,18 @@ class GUI_Controller:
         process_btn.pack(side="left", padx=30)
         file_btn = tk.Button(entry_button_frame, command=open_file, text="Open File", font=("Courier", 20), border=5, width=15, bg=self.offcolor, fg='black')
         file_btn.pack(side="right", padx=30)
+
+        reg_end = 249
+        for i in reversed(range(250)): #Finds the last register that was used so we don't write all 100 registers to the file.
+            reg_end = i
+            if insta.registers[i] != "+0000":
+                reg_end
+                break
+        if reg_end != 0:
+            for i in range(reg_end):
+                entry_box.insert(END, f"{insta.registers[i]}\n")
+            entry_box.insert(END, f"{insta.registers[reg_end]}")
+
 
     def save_file(self):
 
@@ -161,9 +176,9 @@ class GUI_Controller:
                 if insta.registers[i] != "+0000":
                     reg_end = i
                     break
-            for i in range(reg_end + 1): #Writes the final state of the registers to the file
+            for i in range(reg_end): #Writes the final state of the registers to the file
                 save_file.write(insta.registers[i] + "\n")
-            save_file.write("-99999")
+            save_file.write(insta.registers[reg_end])
         return
 
     def clear_table(self):
@@ -308,6 +323,10 @@ class GUI_Controller:
         self.offcolor = user_color_secondary[1] #hex value
 
         self.change_all_colors()
+
+    def terminate(self):
+        os.remove(self.temp_file)
+        window.destroy()
 
 
 class Simulator_Controller:
@@ -502,6 +521,7 @@ sim_op = Simulator_Controller()
 
 #Creates the window containing the program GUI
 window = tk.Tk()
+window.protocol('WM_DELETE_WINDOW', control.terminate) # call function() when window is closed
 menubar = Menu(window)
 filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Load instructions", command=control.load_instructions)
