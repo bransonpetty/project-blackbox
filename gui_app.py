@@ -1,14 +1,17 @@
 from tkinter import ttk
 import tkinter as tk
-from simulator import Simulator
 from tkinter import filedialog
 from tkinter import colorchooser
 from tkinter import *
+from simulator import Simulator
+import subprocess
+import os
 
 class GUI_Controller:
     '''Controls most of the updates to the GUI.'''
     def __init__(self):
         self.file_addr = ""
+        self.temp_file = "./temp.txt"
         self.offcolor = "#FFFFFF" #UVU white
         self.primarycolor='#4C721D' #UVU green
 
@@ -28,7 +31,15 @@ class GUI_Controller:
                     entry_box.insert(END, temp_text)
 
         def process():
-            with open("./temp.txt", "w") as temp:
+            if not os.path.exists(self.temp_file):
+                count = 1
+                success = True
+                while not success:
+                    possible_filename = f"./temp{count}.txt"
+                    success = os.path.exists(possible_filename)
+                self.temp_file = possible_filename
+                  
+            with open(self.temp_file, "w") as temp:
                 temp.write(entry_box.get("1.0", END))
             size_out = validate_input_size()
             size_check = size_out[0]
@@ -48,14 +59,14 @@ class GUI_Controller:
         
         def validate_input_size():
             line_list = []
-            with open("./temp.txt", "r") as temp:
+            with open(self.temp_file, "r") as temp:
                 for line in temp:
                     if line != "":
                         line_list.append(line[0:-1])
                     elif line == "":
                         break
-            if len(line_list) > 100:
-                entry_message.config(text="Error: Your input contain more than 100 instructions.")
+            if len(line_list) > 250: #max line limit 250
+                entry_message.config(text="Error: Your input contain more than 250 instructions.")
                 return (False, [])
             else:
                 return (True, line_list)
@@ -145,8 +156,8 @@ class GUI_Controller:
 
     def save_operation(self):
         with open(self.file_addr, "w") as save_file: #Creates a new file for the report
-            reg_end = 99
-            for i in reversed(range(100)): #Finds the last register that was used so we don't write all 100 registers to the file.
+            reg_end = 249 #changed from 99
+            for i in reversed(range(250)): #Finds the last register that was used so we don't write all 250 registers to the file.
                 if insta.registers[i] != "+0000":
                     reg_end = i
                     break
@@ -238,7 +249,7 @@ class GUI_Controller:
             tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
             return
         
-        for i in range(100): #Sets all the registers back to "+0000"
+        for i in range(250): #Sets all the registers back to "+0000"
             insta.registers[i] = "+0000"
         insta.accumulator = '+0000' #Sets accumulator back to "+0000"
         insta.cur_addr = 0 #Sets the memory pointer back to the first register
@@ -331,8 +342,8 @@ class Simulator_Controller:
     def run(self):
         '''Runs each line of the simulator and calls the controller for the appropriate instructions'''
         choice = True #Stops while loop if user aborts or halts
-        while insta.cur_addr < 100 and choice:
-            if insta.cur_addr == 99 and insta.registers[99] == "+0000":
+        while insta.cur_addr < 250 and choice:
+            if insta.cur_addr == 249 and insta.registers[249] == "+0000": #this was 99 before
                 user_messages.config(text=f"Error: Entire register was executed and program was not halted.")
                 self.error = True
                 self.halt_console()
@@ -481,6 +492,9 @@ class Simulator_Controller:
 
 '''Initial GUI render'''
 
+def new_window():
+    subprocess.Popen(["python", "gui_app.py"])
+
 #Initiates all of the class instances
 insta = Simulator()
 control = GUI_Controller()
@@ -493,6 +507,7 @@ filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Load instructions", command=control.load_instructions)
 filemenu.add_command(label="Save", command=control.save_file)
 filemenu.add_command(label="Save as...", command=control.save_as)
+filemenu.add_command(label="Open new instance", command=new_window)
 menubar.add_cascade(label="File", menu=filemenu)
 executemenu = Menu(menubar, tearoff=0)
 executemenu.add_command(label="Run", command=sim_op.run_cancel_control)
