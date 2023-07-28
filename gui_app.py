@@ -138,29 +138,7 @@ class GUI_Subwindows:
             if file_path:
                 entry_box.delete("1.0", "end") #Deletes the previous text in the input box.
                 with open(file_path) as input_file: #Opens the file and reads the text to the input box.
-                    # temp_text = input_file.read()
-                    done = False
-                    newText = ""
-                    while done is False:
-                        temp_text = input_file.readline()
-                        print(len(temp_text))
-                        if len(temp_text) == 0:
-                            done = True
-                            break
-                        # if (temp_text.endswith('\n') is False):
-                            # temp_text += '\n'
-                        elif len(temp_text) == 6:
-                            temp_arr = [*temp_text]
-                            temp_arr.insert(3, '0')
-                            temp_arr.insert(1, '0')
-                            temp_text = "".join(temp_arr)
-                            newText += temp_text + "\n"
-                        elif len(temp_text) == 8:
-                            newText += temp_text + "\n"
-                        else:
-                            print('Error Invalid Bit Length: ', len(temp_text), ' bit not accepted.')
-                        print(temp_text)
-                    temp_text = newText
+                    temp_text = input_file.read()
                     entry_box.insert(END, temp_text)
 
         def process():
@@ -200,7 +178,6 @@ class GUI_Subwindows:
             if control.file_addr != "":
                 window.title(f"Project Blackbox - ({control.file_addr})")
             else:
-                print(count)
                 window.title(f"Project Blackbox - (New file {count - 1})")
             entry_window.destroy() #Closes the input window.
         
@@ -209,8 +186,6 @@ class GUI_Subwindows:
             line_list = [] 
             with open(self.temp_file, "r") as temp: #Reads the temp file and stores the lines in a list.
                 for line in temp:
-                    print(len(line))
-                    if line 
                     if line != "":
                         line_list.append(line[0:-1])
                     elif line == "":
