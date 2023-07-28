@@ -7,13 +7,10 @@ from simulator import Simulator
 import subprocess
 import os
 
-class GUI_Controller:
-    '''Controls most of the updates to the GUI.'''
+class GUI_Subwindows:
+    '''Generates and controls all the GUI subwindows'''
     def __init__(self):
-        self.file_addr = ""
         self.temp_file = "./temp.txt"
-        self.offcolor = "#FFFFFF" #UVU white
-        self.primarycolor='#4C721D' #UVU green
 
     def load_instructions(self):
 
@@ -23,7 +20,7 @@ class GUI_Controller:
 
         def open_file():
             file_path = filedialog.askopenfilename(filetypes=(("Text File (*.txt)", "*.txt"),), parent=entry_window)
-            self.file_addr = file_path
+            control.file_addr = file_path
             if file_path:
                 entry_box.delete("1.0", "end")
                 with open(file_path) as input_file:
@@ -114,24 +111,24 @@ class GUI_Controller:
                 insta.registers[addr] = line
                 addr += 1
 
-        entry_window = Toplevel(window, background=self.primarycolor)
+        entry_window = Toplevel(window, background=win_style.primarycolor)
         entry_window.geometry("850x700")
-        entry_frame = tk.Frame(entry_window, bg=self.primarycolor)
+        entry_frame = tk.Frame(entry_window, bg=win_style.primarycolor)
         entry_frame.pack()
-        box_frame = tk.Frame(entry_frame, bg=self.primarycolor)
+        box_frame = tk.Frame(entry_frame, bg=win_style.primarycolor)
         box_frame.pack()
         box_scroll = Scrollbar(box_frame)
         box_scroll.pack(side='right', fill='y', pady=(20, 0))
         entry_box = tk.Text(box_frame, wrap="word", width=100, yscrollcommand=box_scroll.set)
         entry_box.pack(side='left', pady=(20, 0))
         box_scroll.config(command = entry_box.yview)
-        entry_message = tk.Label(entry_frame, font=("Arial", 20), text='Enter instructions on the text box above or open a file containing the instructions, then press "Process Entry" to populate de registers.', wraplength=800, bg=self.primarycolor)
+        entry_message = tk.Label(entry_frame, font=("Arial", 20), text='Enter instructions on the text box above or open a file containing the instructions, then press "Process Entry" to populate de registers.', wraplength=800, bg=win_style.primarycolor)
         entry_message.pack(pady=20)
-        entry_button_frame = tk.Frame(entry_frame, bg=self.primarycolor)
+        entry_button_frame = tk.Frame(entry_frame, bg=win_style.primarycolor)
         entry_button_frame.pack()
-        process_btn = tk.Button(entry_button_frame, command=process, text="Process Entry", font=("Courier", 20), border=5, width=15, bg=self.offcolor, fg='black')
+        process_btn = tk.Button(entry_button_frame, command=process, text="Process Entry", font=("Courier", 20), border=5, width=15, bg=win_style.offcolor, fg='black')
         process_btn.pack(side="left", padx=30)
-        file_btn = tk.Button(entry_button_frame, command=open_file, text="Open File", font=("Courier", 20), border=5, width=15, bg=self.offcolor, fg='black')
+        file_btn = tk.Button(entry_button_frame, command=open_file, text="Open File", font=("Courier", 20), border=5, width=15, bg=win_style.offcolor, fg='black')
         file_btn.pack(side="right", padx=30)
 
         reg_end = 249
@@ -145,6 +142,66 @@ class GUI_Controller:
                 entry_box.insert(END, f"{insta.registers[i]}\n")
             entry_box.insert(END, f"{insta.registers[reg_end]}")
 
+    def table_edit(self, event):
+        def edit_submit():
+            user_input = edit_box.get()
+            input_out = validate_input(user_input)
+            check_input = input_out[0]
+            formatted_input = input_out[1]
+            if not check_input:
+                return
+            insta.registers[old_values[0]] = formatted_input
+            self.refresh_table()
+            reg_window.destroy()
+
+        def validate_input(user_input):
+            try:
+                _line_parse_test = int(user_input) #Tests if input if an integer
+            except: #If input is not an integer a ValueError will be triggered and an error is recorded
+                tk.messagebox.showerror("Invalid input", "Input is not a number.", parent=reg_window)
+                return (False, "Fail")
+            if len(user_input) == 5: #Correct lenght for a value with operator sign
+                if user_input[0] == "+" or user_input[0] == "-": #Checks if operator sign is present
+                    return (True, user_input)
+                else: #If the first character is not a operator sign and length is 5, input is invalid
+                    tk.messagebox.showerror("Invalid input", "Input is too long, please enter a 4 digit number with an operator.", parent=reg_window)
+                    return (False, "Fail") 
+            elif len(user_input) == 4:
+                if user_input[0] == "+" or user_input[0] == "-": #If operator sign is present, this is a 3 digit number, which is invalid
+                    tk.messagebox.showerror("Invalid input", "Input is too short, please enter a 4 digit number with an operator.", parent=reg_window)
+                    return (False, "Fail")
+                else: #If the first character is not a operator sign and length is 4, input is valid
+                    return (True, f"+{user_input}")
+            elif int(user_input) == 0:
+                return (True, "+000000")
+            elif user_input == "":
+                tk.messagebox.showerror("No input", "Input is empty, please enter a 4 digit number with an operator.", parent=reg_window)
+                return (False, "Fail")
+            else: #If none of the conditions above are met, the input is invalid
+                tk.messagebox.showerror("Invalid input", "Invalid Input", parent=reg_window)
+                return (False, "Fail")
+            
+        item_id = event.widget.focus()
+        item = event.widget.item(item_id)
+        old_values = item['values']
+        old_values[1] = item['text']
+        reg_window = Toplevel(window, bg=win_style.primarycolor)
+        reg_window.geometry("300x150")
+        edit_label = tk.Label(reg_window, bg=win_style.primarycolor, font=("Arial", 15), text=f"Edit Register {old_values[0]}:")
+        edit_label.pack(pady=(10, 0))
+        edit_box = tk.Entry(reg_window, font=("Arial", 15))
+        edit_box.insert(0, str(old_values[1]))
+        edit_box.pack(pady = (10, 0))
+        edit_submit = tk.Button(reg_window, command=edit_submit, text="Save Register", font=("Courier", 15), border=5, width=15, bg=win_style.offcolor, fg='black')
+        edit_submit.pack(pady=(10, 0))
+
+    def new_window(self):
+        subprocess.Popen(["python", "gui_app.py"])
+
+class GUI_Controller:
+    '''Controls most of the updates to the GUI.'''
+    def __init__(self):
+        self.file_addr = ""
 
     def save_file(self):
 
@@ -197,59 +254,6 @@ class GUI_Controller:
         self.clear_table()
         self.update_table()
 
-    def table_edit(self, event):
-        def edit_submit():
-            user_input = edit_box.get()
-            input_out = validate_input(user_input)
-            check_input = input_out[0]
-            formatted_input = input_out[1]
-            if not check_input:
-                return
-            insta.registers[old_values[0]] = formatted_input
-            self.refresh_table()
-            reg_window.destroy()
-
-        def validate_input(user_input):
-            try:
-                _line_parse_test = int(user_input) #Tests if input if an integer
-            except: #If input is not an integer a ValueError will be triggered and an error is recorded
-                tk.messagebox.showerror("Invalid input", "Input is not a number.", parent=reg_window)
-                return (False, "Fail")
-            if len(user_input) == 5: #Correct lenght for a value with operator sign
-                if user_input[0] == "+" or user_input[0] == "-": #Checks if operator sign is present
-                    return (True, user_input)
-                else: #If the first character is not a operator sign and length is 5, input is invalid
-                    tk.messagebox.showerror("Invalid input", "Input is too long, please enter a 4 digit number with an operator.", parent=reg_window)
-                    return (False, "Fail") 
-            elif len(user_input) == 4:
-                if user_input[0] == "+" or user_input[0] == "-": #If operator sign is present, this is a 3 digit number, which is invalid
-                    tk.messagebox.showerror("Invalid input", "Input is too short, please enter a 4 digit number with an operator.", parent=reg_window)
-                    return (False, "Fail")
-                else: #If the first character is not a operator sign and length is 4, input is valid
-                    return (True, f"+{user_input}")
-            elif int(user_input) == 0:
-                return (True, "+000000")
-            elif user_input == "":
-                tk.messagebox.showerror("No input", "Input is empty, please enter a 4 digit number with an operator.", parent=reg_window)
-                return (False, "Fail")
-            else: #If none of the conditions above are met, the input is invalid
-                tk.messagebox.showerror("Invalid input", "Invalid Input", parent=reg_window)
-                return (False, "Fail")
-            
-        item_id = event.widget.focus()
-        item = event.widget.item(item_id)
-        old_values = item['values']
-        old_values[1] = item['text']
-        reg_window = Toplevel(window, bg=self.primarycolor)
-        reg_window.geometry("300x150")
-        edit_label = tk.Label(reg_window, bg=self.primarycolor, font=("Arial", 15), text=f"Edit Register {old_values[0]}:")
-        edit_label.pack(pady=(10, 0))
-        edit_box = tk.Entry(reg_window, font=("Arial", 15))
-        edit_box.insert(0, str(old_values[1]))
-        edit_box.pack(pady = (10, 0))
-        edit_submit = tk.Button(reg_window, command=edit_submit, text="Save Register", font=("Courier", 15), border=5, width=15, bg=self.offcolor, fg='black')
-        edit_submit.pack(pady=(10, 0))
-
     def refresh_accumulator(self):
         '''Updates the accumulator with new values.'''
         accumulator_box['state'] = 'normal' #Entry has to be enabled to be changed
@@ -300,6 +304,17 @@ class GUI_Controller:
         reg_table.selection_set(cur_row)
         reg_table.focus_set()
 
+    def terminate(self):
+        if os.path.exists(sub_windows.temp_file):
+            os.remove(sub_windows.temp_file)
+        window.destroy()
+
+class Style_Controller:
+    '''Controls the program color scheme'''
+    def __init__(self):
+        self.offcolor = "#FFFFFF" #UVU white
+        self.primarycolor='#4C721D' #UVU green
+
     def change_all_colors(self):
         function_frame.configure(bg=self.primarycolor)
         accumulator_frame.configure(bg=self.primarycolor)
@@ -323,12 +338,6 @@ class GUI_Controller:
         self.offcolor = user_color_secondary[1] #hex value
 
         self.change_all_colors()
-
-    def terminate(self):
-        if os.path.exists(self.temp_file):
-            os.remove(self.temp_file)
-        window.destroy()
-
 
 class Simulator_Controller:
     '''Holds all of the GUI simulator functions'''
@@ -512,23 +521,22 @@ class Simulator_Controller:
 
 '''Initial GUI render'''
 
-def new_window():
-    subprocess.Popen(["python", "gui_app.py"])
-
 #Initiates all of the class instances
 insta = Simulator()
 control = GUI_Controller()
+sub_windows = GUI_Subwindows()
 sim_op = Simulator_Controller()
+win_style = Style_Controller()
 
 #Creates the window containing the program GUI
 window = tk.Tk()
 window.protocol('WM_DELETE_WINDOW', control.terminate) # call function() when window is closed
 menubar = Menu(window)
 filemenu = Menu(menubar, tearoff=0)
-filemenu.add_command(label="Load instructions", command=control.load_instructions)
+filemenu.add_command(label="Load instructions", command=sub_windows.load_instructions)
 filemenu.add_command(label="Save", command=control.save_file)
 filemenu.add_command(label="Save as...", command=control.save_as)
-filemenu.add_command(label="Open new instance", command=new_window)
+filemenu.add_command(label="Open new instance", command=sub_windows.new_window)
 menubar.add_cascade(label="File", menu=filemenu)
 executemenu = Menu(menubar, tearoff=0)
 executemenu.add_command(label="Run", command=sim_op.run_cancel_control)
@@ -537,7 +545,7 @@ executemenu.add_command(label="Clear registers", command=control.reset_memory)
 executemenu.add_command(label="Clear console", command=control.clear_console)
 menubar.add_cascade(label="Execution", menu=executemenu)
 stylemenu = Menu(menubar, tearoff=0)
-stylemenu.add_command(label="Change color scheme", command=control.choose_color)
+stylemenu.add_command(label="Change color scheme", command=win_style.choose_color)
 menubar.add_cascade(label="Style", menu=stylemenu)
 window.config(menu=menubar)
 window.title("Project Blackbox")
@@ -548,7 +556,7 @@ window.resizable(False, False)
 register_frame = ttk.Frame(window, border=20) #Frame containing the GUI register 
 register_frame.pack(fill='y', side=tk.LEFT)
 newStyle = ttk.Style()
-newStyle.configure('My.TFrame', background=control.primarycolor)
+newStyle.configure('My.TFrame', background=win_style.primarycolor)
 register_frame.config(style='My.TFrame')
 
 reg_table = ttk.Treeview(register_frame, selectmode ='browse', padding=2) #GUI register table
@@ -573,49 +581,49 @@ reg_table.column("2", width = 300, anchor ='c')
 reg_table.heading("1", text ="Register")
 reg_table.heading("2", text ="Value")
 
-reg_table.bind("<Double-Button-1>", control.table_edit)
+reg_table.bind("<Double-Button-1>", sub_windows.table_edit)
 
 control.update_table()
 
 #Creates all the other GUI items to the right of the GUI register table
-function_frame = tk.Frame(window, bg =control.primarycolor) 
+function_frame = tk.Frame(window, bg =win_style.primarycolor) 
 function_frame.pack(side='right', fill='y')
 
-accumulator_frame = tk.Frame(function_frame, background=control.primarycolor) #Frame containing the accumulator display
+accumulator_frame = tk.Frame(function_frame, background=win_style.primarycolor) #Frame containing the accumulator display
 accumulator_frame.pack(side="top", pady=(20,0))
 
-accumulator_label = tk.Label(accumulator_frame, text="Accumulator: ", font=("Arial", 20), bg=control.primarycolor) #Accumulator title
+accumulator_label = tk.Label(accumulator_frame, text="Accumulator: ", font=("Arial", 20), bg=win_style.primarycolor) #Accumulator title
 accumulator_label.pack(side="left")
-accumulator_box = tk.Entry(accumulator_frame, font=("Arial", 20), width=8, bg=control.primarycolor) #Accumulator display
+accumulator_box = tk.Entry(accumulator_frame, font=("Arial", 20), width=8, bg=win_style.primarycolor) #Accumulator display
 accumulator_box.pack(side="right")
 
 accumulator_box.insert(END, insta.accumulator) #Populates the accumulator
 accumulator_box['state'] = 'readonly'
 
-input_frame = tk.Frame(function_frame, bg=control.primarycolor) #Frame containing console and user input
+input_frame = tk.Frame(function_frame, bg=win_style.primarycolor) #Frame containing console and user input
 input_frame.pack(side='top')
 
-console_label = tk.Label(input_frame, text="Console:", font=("Arial", 10), bg=control.primarycolor) #Console title
+console_label = tk.Label(input_frame, text="Console:", font=("Arial", 10), bg=win_style.primarycolor) #Console title
 console_label.pack(side='top', padx = 20, pady = (10, 5), anchor="w")
 console_box = tk.Text(input_frame, state='disabled', wrap="word", height=18) #Console box
 console_box.pack(side='top', anchor='ne', padx = 20, pady = (0, 20))
 
-input_label = tk.Label(input_frame, text="User input:", font=("Arial", 10), bg=control.primarycolor) #Input title
+input_label = tk.Label(input_frame, text="User input:", font=("Arial", 10), bg=win_style.primarycolor) #Input title
 input_label.pack(padx = 20, pady = (0, 10))
 input_box = tk.Entry(input_frame, font=("Arial", 15), state="disabled") #Input box
 input_box.pack(pady = (0, 10))
-submit_input = tk.Button(input_frame, text="Submit Input", font=("Arial", 10), state='disabled', command=sim_op.submit_input, fg='black', bg=control.offcolor) #Input submit button
+submit_input = tk.Button(input_frame, text="Submit Input", font=("Arial", 10), state='disabled', command=sim_op.submit_input, fg='black', bg=win_style.offcolor) #Input submit button
 submit_input.pack(pady = (0, 10))
 
-user_messages = tk.Label(input_frame, font=("Arial", 15), text="Load instructions to execute.", wraplength="400", bg=control.primarycolor) #Text for messages directed to the user.
+user_messages = tk.Label(input_frame, font=("Arial", 15), text="Load instructions to execute.", wraplength="400", bg=win_style.primarycolor) #Text for messages directed to the user.
 user_messages.pack(pady=(5, 10))
 
-button_frame = tk.Frame(function_frame, background=control.primarycolor) #Frame containing all the buttons
+button_frame = tk.Frame(function_frame, background=win_style.primarycolor) #Frame containing all the buttons
 button_frame.pack(side='bottom', anchor='c', fill='y', pady=(0, 70))
 
-open_file_btn = tk.Button(button_frame, text="Load Instructions", font=("Courier", 20), command=control.load_instructions, border=5, width=20, bg=control.offcolor, fg='black') #Button to open file
+open_file_btn = tk.Button(button_frame, text="Load Instructions", font=("Courier", 20), command=sub_windows.load_instructions, border=5, width=20, bg=win_style.offcolor, fg='black') #Button to open file
 open_file_btn.pack(side='top', pady=(0, 10))
-run_btn = tk.Button(button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=20, bg=control.offcolor, fg='black') #Button to run and cancel the program execution, can use disabledforeground to make text more readable in needed
+run_btn = tk.Button(button_frame, font=("Courier", 20), command=sim_op.run_cancel_control, text="Run", border=5, width=20, bg=win_style.offcolor, fg='black') #Button to run and cancel the program execution, can use disabledforeground to make text more readable in needed
 run_btn.pack(side='bottom', pady=(10, 0))
 
 window.mainloop() #Triggers the GUI initialization
