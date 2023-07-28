@@ -7,235 +7,45 @@ from simulator import Simulator
 import subprocess
 import os
 
-class GUI_Subwindows:
-    '''Generates and controls all the GUI subwindows'''
-    def __init__(self):
-        self.temp_file = "./temp.txt"
-
-    def load_instructions(self):
-
-        if sim_op.running_state == "running":
-            tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
-            return
-
-        def open_file():
-            file_path = filedialog.askopenfilename(filetypes=(("Text File (*.txt)", "*.txt"),), parent=entry_window)
-            control.file_addr = file_path
-            if file_path:
-                entry_box.delete("1.0", "end")
-                with open(file_path) as input_file:
-                    temp_text = input_file.read()
-                    entry_box.insert(END, temp_text)
-
-        def process():
-            if not os.path.exists(self.temp_file):
-                count = 1
-                success = True
-                possible_filename = ''
-                while success:
-                    possible_filename = f"./temp{count}.txt"
-                    success = os.path.exists(possible_filename)
-                    count += 1
-                self.temp_file = possible_filename
-                  
-            with open(self.temp_file, "w") as temp:
-                temp.write(entry_box.get("1.0", END))
-            size_out = validate_input_size()
-            size_check = size_out[0]
-            loaded_instructions = size_out[1]
-            if not size_check:
-                return
-            instruction_check = validate_instructions(loaded_instructions)
-            if not instruction_check:
-                return
-            while loaded_instructions[-1] == '':
-                loaded_instructions.pop()
-            self.reset_memory()
-            populate_registers(loaded_instructions)
-            self.refresh_table()
-            run_btn['text'] = "Run" #Changes the run button to have the run functionality
-            executemenu.entryconfigure(1, label="Run") #Changes menu button to cancel
-            user_messages.config(text="Input successfully loaded.") #Informs the user that file loaded sucessfully.
-            entry_window.destroy()
-        
-        def validate_input_size():
-            line_list = []
-            with open(self.temp_file, "r") as temp:
-                for line in temp:
-                    if line != "":
-                        line_list.append(line[0:-1])
-                    elif line == "":
-                        break
-            if len(line_list) > 250: #max line limit 250
-                entry_message.config(text="Error: Your input contain more than 250 instructions.")
-                return (False, [])
-            else:
-                return (True, line_list)
-        
-        def validate_instructions(loaded_instructions):
-            line_count = 1
-            for line in loaded_instructions:
-                try:
-                    _line_parse_test = int(line) #Tests if input if an integer
-                except: #If input is not an integer a ValueError will be triggered and an error is recorded
-                    entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
-                    return False
-                if len(line) == 7: #Correct lenght for a value with operator sign
-                    if line[0] == "+" or line[0] == "-": #Checks if operator sign is present
-                        line_count += 1
-                        continue #If no errors from parsing, input is valid
-                    else: #If the first character is not a operator sign and length is 5, input is invalid
-                        entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
-                        return False
-                elif len(line) == 6:
-                    if line[0] == "+" or line[0] == "-": #If operator sign is present, this is a 3 digit number, which is invalid
-                        entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
-                        return False
-                    else: #If the first character is not a operator sign and length is 4, input is valid
-                        line_count += 1
-                        continue #If no errors from parsing, input is valid
-                elif line == "-99999": #This means it's the end of the file.
-                    return True
-                elif line == "": #This is the last instruction
-                    return True
-                else: #If none of the conditions above are met, the input is invalid
-                    entry_message.config(text=f'Error: {line} in your input is not a valid instruction.')
-                    return False
-            return True
-        
-        def populate_registers(loaded_instructions):
-            addr = 0
-            if loaded_instructions[-1] == "-99999":
-                loaded_instructions.pop()
-            for line in loaded_instructions:
-                insta.registers[addr] = line
-                addr += 1
-
-        entry_window = Toplevel(window, background=win_style.primarycolor)
-        entry_window.geometry("850x700")
-        entry_frame = tk.Frame(entry_window, bg=win_style.primarycolor)
-        entry_frame.pack()
-        box_frame = tk.Frame(entry_frame, bg=win_style.primarycolor)
-        box_frame.pack()
-        box_scroll = Scrollbar(box_frame)
-        box_scroll.pack(side='right', fill='y', pady=(20, 0))
-        entry_box = tk.Text(box_frame, wrap="word", width=100, yscrollcommand=box_scroll.set)
-        entry_box.pack(side='left', pady=(20, 0))
-        box_scroll.config(command = entry_box.yview)
-        entry_message = tk.Label(entry_frame, font=("Arial", 20), text='Enter instructions on the text box above or open a file containing the instructions, then press "Process Entry" to populate de registers.', wraplength=800, bg=win_style.primarycolor)
-        entry_message.pack(pady=20)
-        entry_button_frame = tk.Frame(entry_frame, bg=win_style.primarycolor)
-        entry_button_frame.pack()
-        process_btn = tk.Button(entry_button_frame, command=process, text="Process Entry", font=("Courier", 20), border=5, width=15, bg=win_style.offcolor, fg='black')
-        process_btn.pack(side="left", padx=30)
-        file_btn = tk.Button(entry_button_frame, command=open_file, text="Open File", font=("Courier", 20), border=5, width=15, bg=win_style.offcolor, fg='black')
-        file_btn.pack(side="right", padx=30)
-
-        reg_end = 249
-        for i in reversed(range(250)): #Finds the last register that was used so we don't write all 100 registers to the file.
-            reg_end = i
-            if insta.registers[i] != "+000000":
-                reg_end
-                break
-        if reg_end != 0:
-            for i in range(reg_end):
-                entry_box.insert(END, f"{insta.registers[i]}\n")
-            entry_box.insert(END, f"{insta.registers[reg_end]}")
-
-    def table_edit(self, event):
-        def edit_submit():
-            user_input = edit_box.get()
-            input_out = validate_input(user_input)
-            check_input = input_out[0]
-            formatted_input = input_out[1]
-            if not check_input:
-                return
-            insta.registers[old_values[0]] = formatted_input
-            self.refresh_table()
-            reg_window.destroy()
-
-        def validate_input(user_input):
-            try:
-                _line_parse_test = int(user_input) #Tests if input if an integer
-            except: #If input is not an integer a ValueError will be triggered and an error is recorded
-                tk.messagebox.showerror("Invalid input", "Input is not a number.", parent=reg_window)
-                return (False, "Fail")
-            if len(user_input) == 5: #Correct lenght for a value with operator sign
-                if user_input[0] == "+" or user_input[0] == "-": #Checks if operator sign is present
-                    return (True, user_input)
-                else: #If the first character is not a operator sign and length is 5, input is invalid
-                    tk.messagebox.showerror("Invalid input", "Input is too long, please enter a 4 digit number with an operator.", parent=reg_window)
-                    return (False, "Fail") 
-            elif len(user_input) == 4:
-                if user_input[0] == "+" or user_input[0] == "-": #If operator sign is present, this is a 3 digit number, which is invalid
-                    tk.messagebox.showerror("Invalid input", "Input is too short, please enter a 4 digit number with an operator.", parent=reg_window)
-                    return (False, "Fail")
-                else: #If the first character is not a operator sign and length is 4, input is valid
-                    return (True, f"+{user_input}")
-            elif int(user_input) == 0:
-                return (True, "+000000")
-            elif user_input == "":
-                tk.messagebox.showerror("No input", "Input is empty, please enter a 4 digit number with an operator.", parent=reg_window)
-                return (False, "Fail")
-            else: #If none of the conditions above are met, the input is invalid
-                tk.messagebox.showerror("Invalid input", "Invalid Input", parent=reg_window)
-                return (False, "Fail")
-            
-        item_id = event.widget.focus()
-        item = event.widget.item(item_id)
-        old_values = item['values']
-        old_values[1] = item['text']
-        reg_window = Toplevel(window, bg=win_style.primarycolor)
-        reg_window.geometry("300x150")
-        edit_label = tk.Label(reg_window, bg=win_style.primarycolor, font=("Arial", 15), text=f"Edit Register {old_values[0]}:")
-        edit_label.pack(pady=(10, 0))
-        edit_box = tk.Entry(reg_window, font=("Arial", 15))
-        edit_box.insert(0, str(old_values[1]))
-        edit_box.pack(pady = (10, 0))
-        edit_submit = tk.Button(reg_window, command=edit_submit, text="Save Register", font=("Courier", 15), border=5, width=15, bg=win_style.offcolor, fg='black')
-        edit_submit.pack(pady=(10, 0))
-
-    def new_window(self):
-        subprocess.Popen(["python", "gui_app.py"])
-
 class GUI_Controller:
     '''Controls most of the updates to the GUI.'''
     def __init__(self):
-        self.file_addr = ""
+        self.file_addr = "" #Stores the address of the file that is currently open.
 
     def save_file(self):
-
-        if sim_op.running_state == "running":
+        '''Saves instructions to the same file from which it was opened'''
+        if sim_op.running_state == "running": #It will block the user from saving the file while the program is running.
             tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
             return
         
-        if self.file_addr == "":
+        if self.file_addr == "": #If no file is open, it will prompt the user to save as a new file.
             self.save_as()
             return
-        else:
+        else: #If a file is open, it will save the instructions to that file.
             self.save_operation()
             return
 
     def save_as(self):
-
-        if sim_op.running_state == "running":
+        '''Saves all the instructions to a new file.'''
+        if sim_op.running_state == "running": #It will block the user from saving the file while the program is running.
             tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
             return
-
+        #Creates a dialog box for the user to select the file name and location.
         savedialog = filedialog.asksaveasfile(initialfile="Instructions.txt", defaultextension=".txt", filetypes=[("Text Documents","*.txt")])
-        self.file_addr = savedialog.name
+        self.file_addr = savedialog.name #Stores the address of the file that is currently open.
         self.save_operation()
 
     def save_operation(self):
+        '''Handles the save operation'''
         with open(self.file_addr, "w") as save_file: #Creates a new file for the report
-            reg_end = 249 #changed from 99
+            reg_end = 249 #Will hold the last register that was used once the for loop interates through them.
             for i in reversed(range(250)): #Finds the last register that was used so we don't write all 250 registers to the file.
                 if insta.registers[i] != "+000000":
                     reg_end = i
                     break
             for i in range(reg_end): #Writes the final state of the registers to the file
                 save_file.write(insta.registers[i] + "\n")
-            save_file.write(insta.registers[reg_end])
+            save_file.write(insta.registers[reg_end]) #Writes the final register without a new line character
         return
 
     def clear_table(self):
@@ -263,14 +73,13 @@ class GUI_Controller:
 
     def reset_memory(self):
         '''Resets the simulator and the GUI.'''
-
-        if sim_op.running_state == "running":
+        if sim_op.running_state == "running": #It will block the user from resetting the simulator while the program is running.
             tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
             return
         
-        for i in range(250): #Sets all the registers back to "+0000"
+        for i in range(250): #Sets all the registers back to "+000000"
             insta.registers[i] = "+000000"
-        insta.accumulator = '+000000' #Sets accumulator back to "+0000"
+        insta.accumulator = '+000000' #Sets accumulator back to "+000000"
         insta.cur_addr = 0 #Sets the memory pointer back to the first register
         insta.console_memory = "" #Clears the console memory
         insta.log = [] #Clears the logs
@@ -279,8 +88,7 @@ class GUI_Controller:
 
     def clear_console(self):
         '''Clears all the console outputs.'''
-
-        if sim_op.running_state == "running":
+        if sim_op.running_state == "running": #It will block the user from clearing the console while the program is running.
             tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
             return
         
@@ -305,9 +113,215 @@ class GUI_Controller:
         reg_table.focus_set()
 
     def terminate(self):
+        '''Deletes the temp file once operation is completed'''
         if os.path.exists(sub_windows.temp_file):
             os.remove(sub_windows.temp_file)
         window.destroy()
+
+class GUI_Subwindows:
+    '''Generates and controls all the GUI subwindows'''
+    def __init__(self):
+        self.temp_file = "./temp.txt" #This is the temporary file used to stored the instructions in the registers.
+
+    def load_instructions(self):
+        '''Opens instruction input subwindow'''
+        if sim_op.running_state == "running": #It will block the user from loading the instructions while the program is running.
+            tk.messagebox.showerror("Invalid Operation", "Program is currently running, cancel process before proceeding.", parent=window)
+            return
+
+        def open_file():
+            '''Opens file containing instructions'''
+            #Creates a dialog box for the user to select the file name and location.
+            file_path = filedialog.askopenfilename(filetypes=(("Text File (*.txt)", "*.txt"),), parent=entry_window)
+            control.file_addr = file_path #Stores the address of the file that is currently open.
+            if file_path:
+                entry_box.delete("1.0", "end") #Deletes the previous text in the input box.
+                with open(file_path) as input_file: #Opens the file and reads the text to the input box.
+                    temp_text = input_file.read()
+                    entry_box.insert(END, temp_text)
+
+        def process():
+            '''Processes the user inputs'''
+            if not os.path.exists(self.temp_file): #Creates a temporary file if it does not exist.
+                count = 1
+                success = True
+                possible_filename = ''
+                while success: #Checks if the file name is already taken, interates through it until finds an unused filename.
+                    possible_filename = f"./temp{count}.txt"
+                    success = os.path.exists(possible_filename)
+                    count += 1
+                self.temp_file = possible_filename #Saves the temp file location.
+                  
+            with open(self.temp_file, "w") as temp: #Writes the user input to the temp file.
+                temp.write(entry_box.get("1.0", END))
+            size_out = validate_input_size() #Checks if the user input will fit in the registers.
+            size_check = size_out[0] #Stores the result of the size check.
+            loaded_instructions = size_out[1] #Saves the instructions list.
+            if not size_check: #If the user input is too large, it will inform the user and delete the temp file.
+                return
+            instruction_check = validate_instructions(loaded_instructions) #Checks if the instructions are valid.
+            if not instruction_check: #If the instructions are invalid, it will inform the user and delete the temp file.
+                return
+            while loaded_instructions[-1] == '': #Removes any empty lines at the end of the list.
+                loaded_instructions.pop()
+            self.reset_memory() #Resets the simulator and the GUI.
+            populate_registers(loaded_instructions) #Loads the instructions into the registers.
+            self.refresh_table() #Refreshes the GUI register table.
+            run_btn['text'] = "Run" #Changes the run button to have the run functionality
+            executemenu.entryconfigure(1, label="Run") #Changes menu button to cancel
+            user_messages.config(text="Input successfully loaded.") #Informs the user that file loaded sucessfully.
+            entry_window.destroy() #Closes the input window.
+        
+        def validate_input_size():
+            '''Verifies if the user input will fit in the registers'''
+            line_list = [] 
+            with open(self.temp_file, "r") as temp: #Reads the temp file and stores the lines in a list.
+                for line in temp:
+                    if line != "":
+                        line_list.append(line[0:-1])
+                    elif line == "":
+                        break
+            if len(line_list) > 250: #max line limit 250
+                entry_message.config(text="Error: Your input contain more than 250 instructions.")
+                return (False, []) #Returns false if the input is too large.
+            else:
+                return (True, line_list) #Returns true if the input is valid.
+        
+        def validate_instructions(loaded_instructions):
+            '''Verifies if all of the inputs are valid'''
+            line_count = 1
+            for line in loaded_instructions:
+                try:
+                    _line_parse_test = int(line) #Tests if input if an integer
+                except: #If input is not an integer a ValueError will be triggered and an error is recorded
+                    entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
+                    return False
+                if len(line) == 7: #Correct lenght for a value with operator sign
+                    if line[0] == "+" or line[0] == "-": #Checks if operator sign is present
+                        line_count += 1
+                        continue #If no errors from parsing, input is valid
+                    else: #If the first character is not a operator sign and length is 7, input is invalid
+                        entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
+                        return False
+                elif len(line) == 6:
+                    if line[0] == "+" or line[0] == "-": #If operator sign is present, this is a 5 digit number, which is invalid
+                        entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
+                        return False
+                    else: #If the first character is not a operator sign and length is 6, input is valid
+                        line_count += 1
+                        continue #If no errors from parsing, input is valid
+                elif line == "-99999": #This means it's the end of the file.
+                    return True
+                elif line == "": #This is the last instruction
+                    return True
+                else: #If none of the conditions above are met, the input is invalid
+                    entry_message.config(text=f'Error: {line} in your input is not a valid instruction.')
+                    return False
+            return True
+        
+        def populate_registers(loaded_instructions):
+            '''Populates all of the registers with user input'''
+            addr = 0
+            if loaded_instructions[-1] == "-99999": #If the last instruction is -99999, it is removed.
+                loaded_instructions.pop()
+            for line in loaded_instructions: #Iterates through the instructions and stores them in the registers.
+                insta.registers[addr] = line
+                addr += 1
+
+        entry_window = Toplevel(window, background=win_style.primarycolor) #Creates a subwindow.
+        entry_window.geometry("850x700") #Sets the size of the subwindow.
+        entry_frame = tk.Frame(entry_window, bg=win_style.primarycolor) #Creates a frame for the subwindow that contains everything in the box.
+        entry_frame.pack()
+        box_frame = tk.Frame(entry_frame, bg=win_style.primarycolor) #Creates a frame for the text box.
+        box_frame.pack()
+        box_scroll = Scrollbar(box_frame) #Creates a scrollbar for the text box.
+        box_scroll.pack(side='right', fill='y', pady=(20, 0))
+        entry_box = tk.Text(box_frame, wrap="word", width=100, yscrollcommand=box_scroll.set) #Creates the text box.
+        entry_box.pack(side='left', pady=(20, 0))
+        box_scroll.config(command = entry_box.yview)
+        #Reserves a space to display error messages.
+        entry_message = tk.Label(entry_frame, font=("Arial", 20), text='Enter instructions on the text box above or open a file containing the instructions, then press "Process Entry" to populate de registers.', wraplength=800, bg=win_style.primarycolor)
+        entry_message.pack(pady=20)
+        entry_button_frame = tk.Frame(entry_frame, bg=win_style.primarycolor) #Creates a frame containing all the buttons.
+        entry_button_frame.pack()
+        #Button to process the user input.
+        process_btn = tk.Button(entry_button_frame, command=process, text="Process Entry", font=("Courier", 20), border=5, width=15, bg=win_style.offcolor, fg='black')
+        process_btn.pack(side="left", padx=30)
+        #Button to open a file.
+        file_btn = tk.Button(entry_button_frame, command=open_file, text="Open File", font=("Courier", 20), border=5, width=15, bg=win_style.offcolor, fg='black')
+        file_btn.pack(side="right", padx=30)
+        #Populates the text box with the current registers.
+        reg_end = 249
+        for i in reversed(range(250)): #Finds the last register that was used so we don't write all 100 registers to the file.
+            reg_end = i
+            if insta.registers[i] != "+000000":
+                reg_end
+                break
+        if reg_end != 0:
+            for i in range(reg_end):
+                entry_box.insert(END, f"{insta.registers[i]}\n")
+            entry_box.insert(END, f"{insta.registers[reg_end]}") #This is to avoid a blank line at the end of the file.
+
+    def table_edit(self, event):
+        '''Opens the subwindow to edit individual registers'''
+        def edit_submit():
+            '''Processes the user input into the register'''
+            user_input = edit_box.get() #Gets the user input
+            input_out = validate_input(user_input) #Validates the user input
+            check_input = input_out[0] #Checks if the input is valid
+            formatted_input = input_out[1] #Gets the formatted input
+            if not check_input: #If the input is invalid, the function returns
+                return
+            insta.registers[old_values[0]] = formatted_input #If the input is valid, the register is updated
+            self.refresh_table() #Refreshes the table
+            reg_window.destroy() #Closes the subwindow
+
+        def validate_input(user_input):
+            '''Validates if user input the correct value'''
+            try:
+                _line_parse_test = int(user_input) #Tests if input if an integer
+            except: #If input is not an integer a ValueError will be triggered and an error is recorded
+                tk.messagebox.showerror("Invalid input", "Input is not a number.", parent=reg_window)
+                return (False, "Fail")
+            if len(user_input) == 7: #Correct lenght for a value with operator sign
+                if user_input[0] == "+" or user_input[0] == "-": #Checks if operator sign is present
+                    return (True, user_input)
+                else: #If the first character is not a operator sign and length is 7, input is invalid
+                    tk.messagebox.showerror("Invalid input", "Input is too long, please enter a 6 digit number with an operator.", parent=reg_window)
+                    return (False, "Fail") 
+            elif len(user_input) == 6:
+                if user_input[0] == "+" or user_input[0] == "-": #If operator sign is present, this is a 5 digit number, which is invalid
+                    tk.messagebox.showerror("Invalid input", "Input is too short, please enter a 6 digit number with an operator.", parent=reg_window)
+                    return (False, "Fail")
+                else: #If the first character is not a operator sign and length is 6, input is valid
+                    return (True, f"+{user_input}")
+            elif int(user_input) == 0:
+                return (True, "+000000")
+            elif user_input == "":
+                tk.messagebox.showerror("No input", "Input is empty, please enter a 6 digit number with an operator.", parent=reg_window)
+                return (False, "Fail")
+            else: #If none of the conditions above are met, the input is invalid
+                tk.messagebox.showerror("Invalid input", "Invalid Input", parent=reg_window)
+                return (False, "Fail")
+            
+        item_id = event.widget.focus() #Gets the id of the selected item
+        item = event.widget.item(item_id) #Gets the item from the id
+        old_values = item['values'] #Gets the values from the item
+        old_values[1] = item['text'] #Gets the text from the item
+        reg_window = Toplevel(window, bg=win_style.primarycolor) #Creates a subwindow
+        reg_window.geometry("300x150") #Sets the size of the subwindow
+        edit_label = tk.Label(reg_window, bg=win_style.primarycolor, font=("Arial", 15), text=f"Edit Register {old_values[0]}:")
+        edit_label.pack(pady=(10, 0))
+        edit_box = tk.Entry(reg_window, font=("Arial", 15)) #Creates a text box to enter the new value
+        edit_box.insert(0, str(old_values[1])) #Inserts the old value into the text box
+        edit_box.pack(pady = (10, 0))
+        edit_submit = tk.Button(reg_window, command=edit_submit, text="Save Register", font=("Courier", 15), border=5, width=15, bg=win_style.offcolor, fg='black') #Creates a button to submit the new value
+        edit_submit.pack(pady=(10, 0))
+
+    def new_window(self):
+        '''Opens a new window to run the program'''
+        subprocess.Popen(["python", "gui_app.py"])
+
 
 class Style_Controller:
     '''Controls the program color scheme'''
@@ -316,6 +330,7 @@ class Style_Controller:
         self.primarycolor='#4C721D' #UVU green
 
     def change_all_colors(self):
+        '''Updates all the colors in the GUI'''
         function_frame.configure(bg=self.primarycolor)
         accumulator_frame.configure(bg=self.primarycolor)
         accumulator_label.configure(bg=self.primarycolor)
@@ -431,7 +446,7 @@ class Simulator_Controller:
         '''Prepares GUI to accept user input.'''
         self.current_addr = addr #Stores the current address to be used by submit_input function
         console_box.config(state='normal') #Text had to be enabled to be changed.
-        console_box.insert(END, f'Enter a positive or negative 6 digit number into memory register {addr}, then press the submit button (ex: +1234 or -4321): ')
+        console_box.insert(END, f'Enter a positive or negative 6 digit number into memory register {addr}, then press the submit button (ex: +012034 or -043021): ')
         console_box.see(END) #Scrolls the console down
         console_box.config(state='disabled') #Disables the text box after modifications.
         control.show_input() #Enables the user input
@@ -441,12 +456,12 @@ class Simulator_Controller:
         '''Submits the user input to be loaded into memory'''
         user_input = input_box.get() #Retrieves information from user input box
         #From this point down, we validate and format the user input to be stored properly in the registers.
-        #If user entered a positive value or "0000" without a +, it will be added. And it will check if entered a 4 digit number.
+        #If user entered a positive value or "000000" without a +, it will be added. And it will check if entered a 6 digit number.
         #Negative values must be entered with a - to be valid. Validated and formated input will be stored in formatted_input.
         success = False #Informs program if execution was successful in order to display appropriate user messages
         try:
             if len(user_input) == 0: #Error is displayed if no input is entered
-                user_messages.config(text="No input. Please enter a valid positive or negative 4 digit number.")
+                user_messages.config(text="No input. Please enter a valid positive or negative 6 digit number.")
                 input_box.delete(0, END) #Clears the user input box
             elif user_input[0] == "-" or user_input[0] == "+": #It first checks if a operation sign is present.
                 if len(user_input) == 7: #If it is, it checks if the number is 6 digits long with sign.
@@ -459,7 +474,7 @@ class Simulator_Controller:
                     console_box.config(state='disabled') #Disables the text box after modifications.
                     input_box.delete(0, END) #Clears the user input
                     success = True #Sets success to true to inform program that execution was sucessfull.
-                else: #Triggers error if there's more than 4 digits after operator sign.
+                else: #Triggers error if there's more than 6 digits after operator sign.
                     user_messages.config(text="Invalid input. Please enter a valid positive or negative 6 digit number.")
                     input_box.delete(0, END) #Clears the user input box
             elif int(user_input) == 0: #If 000000 is entered without a sign, we return it with the + sign..
@@ -472,7 +487,7 @@ class Simulator_Controller:
                 input_box.delete(0, END) #Clears the user input
                 success = True #Sets success to true to inform program that execution was sucessfull.
             elif len(user_input) == 6:
-                _user_int = int(user_input) #if it's 4 digits long and it can parse, it's a valid positive number.
+                _user_int = int(user_input) #if it's 6 digits long and it can parse, it's a valid positive number.
                 insta.console_memory = f"+{user_input}" #We add the plus sign and add it to the console memory.
                 insta.read(self.current_addr) #Triggers the simulator read function
                 console_box.config(state='normal') #Text had to be enabled to be changed.
@@ -530,7 +545,7 @@ win_style = Style_Controller()
 
 #Creates the window containing the program GUI
 window = tk.Tk()
-window.protocol('WM_DELETE_WINDOW', control.terminate) # call function() when window is closed
+window.protocol('WM_DELETE_WINDOW', control.terminate) # calls control.terminate() when window is closed
 menubar = Menu(window)
 filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Load instructions", command=sub_windows.load_instructions)
