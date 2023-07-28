@@ -39,21 +39,29 @@ HALT = 043 Pause the program
 class Simulator:
     def __init__(self):
         self.registers = {} #Initializes the registers
+        self.register_size = 249 #Saves the number of the last register
         self.accumulator = "+000000" #Initializes the accumulator
         self.cur_addr = 0 #Initializes the current address
         self.console_memory = ""
         self.instructions = ["000", "010", "011", "020", "021", "030", "031", "032", "033", "040", "041", "042", "043"] #Lists all the valid instructions
+        self.error_message = '' #Stores the last error message encountered
 
         for i in range(250): #Creates the registers using a dictionary
             self.registers[i] = "+000000"
             
     def read(self, addr):
         '''Reads a word from the keyboard into a specific location in memory.'''
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         self.registers[int(addr)] = self.console_memory #Stores the formatted input into the desired register.
         return True
         
     def write(self, addr):
         '''Writes a word from a specific location in memory to screen.'''
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         self.console_memory = self.registers[int(addr)] #Gets the word from the register.
         return True
         
@@ -61,12 +69,18 @@ class Simulator:
     
     def load(self, addr):
         '''Loads a word from a specific location in memory into the accumulator.'''
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         word = self.registers[int(addr)] #Gets the word from the register.
         self.accumulator = word #Loads the word into the accumulator.
         return True
 
     def store(self, addr):
         '''Stores a word from the accumulator into a specific location in memory.'''
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         self.registers[int(addr)] = self.accumulator #Stores the word from the accumulator into the register.
         return True
     
@@ -74,8 +88,12 @@ class Simulator:
     
     def add(self, addr):
         '''Adds a word from a specific location in memory to the word in the accumulator (leaves the result in the accumulator)'''
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         result = int(self.accumulator) + int(self.registers[int(addr)]) #Adds the word from the register to the word in the accumulator.
         if result > 999999 or result < -999999: #Checks if the result is too large to be stored in the accumulator.
+            self.error_message = f"Overflow error: The result ({result}) contain more digits than it can be stored in the registers."
             return False
         #The following elif and else statements format the result to be stored in the accumulator.
         elif result > 0: 
@@ -88,9 +106,12 @@ class Simulator:
 
     def subtract(self, addr):
         '''Subtracts a word from a specific location in memory from the word in the accumulator (leaves the result in the accumulator)'''
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         result = int(self.accumulator) - int(self.registers[int(addr)]) #Subtracts the word from the register from the word in the accumulator.
         if result > 999999 or result < -999999: #Checks if the result is too large to be stored in the accumulator.
-            print(f"Overflow error on subtraction in address {addr}.\nThe result is too large to be stored in the accumulator. The program will now be terminated.")
+            self.error_message = f"Overflow error: The result ({result}) contain more digits than it can be stored in the registers."
             return False
         #The following elif and else statements format the result to be stored in the accumulator.
         elif result > 0:
@@ -103,9 +124,13 @@ class Simulator:
 
     def divide(self, addr):
         '''Divides the word in the accumulator by a word from a specific location in memory (leaves the result in the accumulator).'''
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         result = int(self.accumulator) // int(self.registers[int(addr)]) #Divides the word in the accumulator by the word from the register.
         #NO DIVISION OPERATION SHOULD RESULT IN OVERFLOW, I'M STILL LEAVING THIS HERE IN CASE THERE IS ANY ABNORMALITY I DIDN'T PREDICT.
         if result > 999999 or result < -999999: #Checks if the result is too large to be stored in the accumulator.
+            self.error_message = f"Overflow error: The result ({result}) contain more digits than it can be stored in the registers."
             return False
         #The following elif and else statements format the result to be stored in the accumulator.
         elif result > 0:
@@ -118,8 +143,12 @@ class Simulator:
 
     def multiply(self, addr):
         '''Multiplies a word from a specific location in memory to the word in the accumulator (leaves the result in the accumulator).'''
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         result = int(self.accumulator) * int(self.registers[int(addr)]) #Multiplies the word in the accumulator by the word from the register.
         if result > 999999 or result < -999999: #Checks if the result is too large to be stored in the accumulator.
+            self.error_message = f"Overflow error: The result ({result}) contain more digits than it can be stored in the registers."
             return False
         #The following elif and else statements format the result to be stored in the accumulator.
         elif result > 0:
@@ -136,6 +165,9 @@ class Simulator:
         '''Branches to a specific location in memory.'''
         #Sets the current address to the address specified in the instruction.
         #It subtracts 1 from the desired address since the program moves to next location upon returning.
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         self.cur_addr = int(addr) - 1
         return True
     
@@ -143,6 +175,9 @@ class Simulator:
         '''Branches to a specific location in memory if the accumulator is negative.'''
         #Sets the current address to the address specified in the instruction if accumulator is negative.
         #It subtracts 1 from the desired address since the program moves to next location upon returning.
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         if int(int(self.accumulator)) < 0:
             self.cur_addr = int(addr) - 1
         return True
@@ -151,6 +186,9 @@ class Simulator:
         '''Branches to a specific location in memory if the accumulator is zero.'''
         #Sets the current address to the address specified in the instruction if accumulator is "+000000".
         #It subtracts 1 from the desired address since the program moves to next location upon returning.
+        if int(addr) > self.register_size: #Checks if the address is valid.
+            self.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         if self.accumulator == "+000000":
             self.cur_addr = int(addr) - 1
         return True
