@@ -159,9 +159,12 @@ class GUI_Subwindows:
             size_out = validate_input_size() #Checks if the user input will fit in the registers.
             size_check = size_out[0] #Stores the result of the size check.
             loaded_instructions = size_out[1] #Saves the instructions list.
+            loaded_instructions = bit_conversion(loaded_instructions) #Converts 4 bit instructions to 6 bit instructions.
             if not size_check: #If the user input is too large, it will inform the user and delete the temp file.
                 return
-            instruction_check = validate_instructions(loaded_instructions) #Checks if the instructions are valid.
+            instruction_output = validate_instructions(loaded_instructions) #Checks if the instructions are valid.
+            instruction_check = instruction_output[0] #Stores the result of the instruction check.
+            loaded_instructions = instruction_output[1] #Saves the instructions list.
             if not instruction_check: #If the instructions are invalid, it will inform the user and delete the temp file.
                 return
             while loaded_instructions[-1] == '': #Removes any empty lines at the end of the list.
@@ -194,39 +197,53 @@ class GUI_Subwindows:
             else:
                 return (True, line_list) #Returns true if the input is valid.
         
+        def bit_conversion(instruction_list):
+            '''Converts 4 bit instructions to 6 bit instructions'''
+            new_list = []
+            for line in instruction_list:
+                if len(line) == 4:
+                    line = "0" + line[0:2] + "0" + line[2:]
+                elif len(line) == 5:
+                    line = line[0:1] + "0" + line[1:3] + "0" + line[3:]
+                new_list.append(line)
+            return new_list
+
         def validate_instructions(loaded_instructions):
             '''Verifies if all of the inputs are valid'''
+            line_list = []
             line_count = 1
             for line in loaded_instructions:
                 try:
                     _line_parse_test = int(line) #Tests if input if an integer
                 except: #If input is not an integer a ValueError will be triggered and an error is recorded
                     entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
-                    return False
+                    return (False, [])
                 if len(line) == 7: #Correct lenght for a value with operator sign
                     if line[0] == "+" or line[0] == "-": #Checks if operator sign is present
                         line_count += 1
+                        line_list.append(line) #If operator sign is present, this is a 6 digit number, which is valid
                         continue #If no errors from parsing, input is valid
                     else: #If the first character is not a operator sign and length is 7, input is invalid
                         entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
-                        return False
+                        return (False, [])
                 elif len(line) == 6:
                     if line == "-99999":
-                        return True
+                        return (True, line_list)
                     elif line[0] == "+" or line[0] == "-": #If operator sign is present, this is a 5 digit number, which is invalid
                         entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
-                        return False
+                        return (False, [])
                     else: #If the first character is not a operator sign and length is 6, input is valid
                         line_count += 1
+                        line_list.append(f"+{line}")
                         continue #If no errors from parsing, input is valid
                 elif line == "-99999": #This means it's the end of the file.
-                    return True
+                    return (True, line_list)
                 elif line == "": #This is the last instruction
-                    return True
+                    return (True, line_list)
                 else: #If none of the conditions above are met, the input is invalid
                     entry_message.config(text=f'Error: {line} in your input is not a valid instruction.')
-                    return False
-            return True
+                    return (False, [])
+            return (True, line_list) #If no errors from parsing, input is valid
         
         def populate_registers(loaded_instructions):
             '''Populates all of the registers with user input'''
