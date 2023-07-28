@@ -32,44 +32,48 @@ of BasicML scripts.
 
 You can load the instructions buy pressing the "Load Instruction" button as shown bellow or in the "File" menu on the top of the program:
 
-![Load Instruction(Button)](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Load%20instruction%20(button).png)
+![Load Instruction(Button)](https://github.com/bransonpetty/project-blackbox/blob/develop/readme%20images/Load%20Instructions%20(Button)%20v2.png)
 
 Once you select "Load Instructions", a new window will appear as shown bellow. In this new window you may load the instructions from a file or enter them manually buy entering all of the instructions in the text box in the window. If you decide to open a file, you will be given the change to modify the instructions before loading them to the registers by pressing "Process Entry":
 
-![Load Instruction(Window)](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Load%20instruction%20(window).png)
+![Load Instruction(Window)](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Load%20Instructions%20(Window)%20v2.png)
 
 Once the instructions successfully loaded, they will be displayed the table shown in the first image bellow. At this point, you may double click any of the register entry in the table to edit it. Once you double click it, the window shown in the second image bellow will appear and you may enter the new value to be stored in the register:
 
-![Registers](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Registers.png)
-![Registers (Double Click)](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Edit%20register.png)
+![Registers](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Registers%20v2.png)
+![Registers (Double Click)](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Edit%20Register%20v2.png)
 
 Once the registers are loaded as desired you may execute the instructions by pressing the Run button as shown bellow:
 
-![Run Button](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Run%20Button.png)
+![Run Button](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Run%20(Button)%20v2.png)
 
 While the program is executing, a new button will appear that will allow you to abort the execution:
 
-![Cancel Button](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Cancel%20button.png)
+![Cancel Button](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Cancel%20(Button)%20v2.png)
 
 Once the program execution is completed, you will be given the option to rerun the program by pressing the button shown bellow (Just keep in mind that the program will run with all the modifications made during the previous execution):
 
-![Rerun Button](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Rerun%20button.png)
+![Rerun Button](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Rerun%20(Button)%20v2.png)
 
 In the top of the window you will find a "File" menu that can be used to load the instructions or save the register instructions to a txt file:
 
-![File Menu](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/File%20menu.png)
+![File Menu](https://github.com/bransonpetty/project-blackbox/blob/develop/readme%20images/File%20(Menu)%20v2.png)
 
 Next to the "File" menu you will find the "Execution menu" that can be used to run/cancel/rerun program, reset all the register to 0, and clear the console:
 
-![Execution Menu](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Execution%20menu.png)
+![Execution Menu](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Execute%20(Menu)%20v2.png)
 
-If you wish to change the color scheme of the program, you may click on the "Change Color Scheme" under the Style menu. Once you select the option, you will be able to choose a primary color (color of the background) as shown bellow:
+If you wish to change the color scheme of the program, you may click on the "Change Color Scheme" under the Style menu. 
 
-![Primary Color](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Select%20Primary.png)
+![Style Menu](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Style%20(Menu).png)
+
+Once you select the option, you will be able to choose a primary color (color of the background) as shown bellow:
+
+![Primary Color](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Style%20(Primary).png)
 
 Then you will be able to choose a secondary color (color of the buttons) as shown bellow:
 
-![Seconday Color](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Select%20Secondary.png)
+![Seconday Color](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Style%20(Secondary).png)
 
 After selecting both colors, the color scheme of the program will be modified as shown bellow:
 
