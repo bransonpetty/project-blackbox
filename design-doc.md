@@ -94,24 +94,24 @@ More information on how the program was implemented, please refer to the Class d
 ## Instructions available:
 
 ### I/O operations:
-- READ = 10 Read a word from the keyboard into a specific location in memory.
-- WRITE = 11 Write a word from a specific location in memory to screen.
+- READ = 010 Read a word from the keyboard into a specific location in memory.
+- WRITE = 011 Write a word from a specific location in memory to screen.
 
 ### Load/store operations:
-- LOAD = 20 Load a word from a specific location in memory into the accumulator.
-- STORE = 21 Store a word from the accumulator into a specific location in memory.
+- LOAD = 020 Load a word from a specific location in memory into the accumulator.
+- STORE = 021 Store a word from the accumulator into a specific location in memory.
 
 ### Arithmetic operations:
-- ADD = 30 Add a word from a specific location in memory to the word in the accumulator (leave the result in the accumulator)
-- SUBTRACT = 31 Subtract a word from a specific location in memory from the word in the accumulator (leave the result in the accumulator)
-- DIVIDE = 32 Divide the word in the accumulator by a word from a specific location in memory (leave the result in the accumulator).
-- MULTIPLY = 33 multiply a word from a specific location in memory to the word in the accumulator (leave the result in the accumulator).
+- ADD = 030 Add a word from a specific location in memory to the word in the accumulator (leave the result in the accumulator)
+- SUBTRACT = 031 Subtract a word from a specific location in memory from the word in the accumulator (leave the result in the accumulator)
+- DIVIDE = 032 Divide the word in the accumulator by a word from a specific location in memory (leave the result in the accumulator).
+- MULTIPLY = 033 multiply a word from a specific location in memory to the word in the accumulator (leave the result in the accumulator).
 
 ### Control operatios:
-- BRANCH = 40 Branch to a specific location in memory
-- BRANCHNEG = 41 Branch to a specific location in memory if the accumulator is negative.
-- BRANCHZERO = 42 Branch to a specific location in memory if the accumulator is zero.
-- HALT = 43 Pause the program
+- BRANCH = 040 Branch to a specific location in memory
+- BRANCHNEG = 041 Branch to a specific location in memory if the accumulator is negative.
+- BRANCHZERO = 042 Branch to a specific location in memory if the accumulator is zero.
+- HALT = 043 Pause the program
 
 ## Example of an valid instruction file:
 
@@ -119,16 +119,16 @@ The following is and example of the correct format of a file to be run through t
 Make sure all the instructions are stored on a *.txt file.
 
 ```
-+1007
-+1008
-+2007
-+2008
-+2109
-+1109
-+4300
-+0000
-+0000
-+0000
++010007
++010008
++020007
++020008
++021009
++011009
++043000
++000000
++000000
++000000
 -99999
 ```
 
