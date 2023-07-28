@@ -88,7 +88,6 @@ class Simulator:
     
     def add(self, addr):
         '''Adds a word from a specific location in memory to the word in the accumulator (leaves the result in the accumulator)'''
-        intial_acc = self.accumulator #Saves the initial value of the accumulator for the log.
         result = int(self.accumulator) + int(self.registers[int(addr)]) #Adds the word from the register to the word in the accumulator.
         if result > 999999 or result < -999999: #Checks if the result is too large to be stored in the accumulator.
             self.error_message = f"Overflow error: The result ({result}) contain more digits than it can be stored in the registers."
