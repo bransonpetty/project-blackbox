@@ -249,7 +249,7 @@ class GUI_Subwindows:
         entry_box.pack(side='left', pady=(20, 0))
         box_scroll.config(command = entry_box.yview)
         #Reserves a space to display error messages.
-        entry_message = tk.Label(entry_frame, font=("Arial", 20), text='Enter instructions on the text box above or open a file containing the instructions, then press "Process Entry" to populate de registers.', wraplength=800, bg=win_style.primarycolor)
+        entry_message = tk.Label(entry_frame, font=("Arial", 20), text='Enter instructions on the text box above or open a file containing the instructions, then press "Process Entry" to populate the registers.', wraplength=800, bg=win_style.primarycolor)
         entry_message.pack(pady=20)
         entry_button_frame = tk.Frame(entry_frame, bg=win_style.primarycolor) #Creates a frame containing all the buttons.
         entry_button_frame.pack()
