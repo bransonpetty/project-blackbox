@@ -33,6 +33,7 @@ class GUI_Controller:
         #Creates a dialog box for the user to select the file name and location.
         savedialog = filedialog.asksaveasfile(initialfile="Instructions.txt", defaultextension=".txt", filetypes=[("Text Documents","*.txt")])
         self.file_addr = savedialog.name #Stores the address of the file that is currently open.
+        window.title(f"Project Blackbox - ({self.file_addr})")
         self.save_operation()
 
     def save_operation(self):
@@ -142,6 +143,7 @@ class GUI_Subwindows:
 
         def process():
             '''Processes the user inputs'''
+            count = 1
             if not os.path.exists(self.temp_file): #Creates a temporary file if it does not exist.
                 count = 1
                 success = True
@@ -170,6 +172,11 @@ class GUI_Subwindows:
             run_btn['text'] = "Run" #Changes the run button to have the run functionality
             executemenu.entryconfigure(1, label="Run") #Changes menu button to cancel
             user_messages.config(text="Input successfully loaded.") #Informs the user that file loaded sucessfully.
+            if control.file_addr != "":
+                window.title(f"Project Blackbox - ({control.file_addr})")
+            else:
+                print(count)
+                window.title(f"Project Blackbox - (New file {count - 1})")
             entry_window.destroy() #Closes the input window.
         
         def validate_input_size():
@@ -559,6 +566,9 @@ win_style = Style_Controller()
 
 #Creates the window containing the program GUI
 window = tk.Tk()
+window.title("Project Blackbox")
+window.geometry("1000x800")
+window.resizable(False, False)
 window.protocol('WM_DELETE_WINDOW', control.terminate) # calls control.terminate() when window is closed
 menubar = Menu(window)
 filemenu = Menu(menubar, tearoff=0)
@@ -577,9 +587,6 @@ stylemenu = Menu(menubar, tearoff=0)
 stylemenu.add_command(label="Change color scheme", command=win_style.choose_color)
 menubar.add_cascade(label="Style", menu=stylemenu)
 window.config(menu=menubar)
-window.title("Project Blackbox")
-window.geometry("1000x800")
-window.resizable(False, False)
 
 #Creates and populates the GUI register table
 register_frame = ttk.Frame(window, border=20) #Frame containing the GUI register 
