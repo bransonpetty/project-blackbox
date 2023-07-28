@@ -164,9 +164,9 @@ class GUI_Subwindows:
                 return
             while loaded_instructions[-1] == '': #Removes any empty lines at the end of the list.
                 loaded_instructions.pop()
-            self.reset_memory() #Resets the simulator and the GUI.
+            control.reset_memory() #Resets the simulator and the GUI.
             populate_registers(loaded_instructions) #Loads the instructions into the registers.
-            self.refresh_table() #Refreshes the GUI register table.
+            control.refresh_table() #Refreshes the GUI register table.
             run_btn['text'] = "Run" #Changes the run button to have the run functionality
             executemenu.entryconfigure(1, label="Run") #Changes menu button to cancel
             user_messages.config(text="Input successfully loaded.") #Informs the user that file loaded sucessfully.
@@ -204,7 +204,9 @@ class GUI_Subwindows:
                         entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
                         return False
                 elif len(line) == 6:
-                    if line[0] == "+" or line[0] == "-": #If operator sign is present, this is a 5 digit number, which is invalid
+                    if line == "-99999":
+                        return True
+                    elif line[0] == "+" or line[0] == "-": #If operator sign is present, this is a 5 digit number, which is invalid
                         entry_message.config(text=f'Error(line {line_count}): {line} in your input is not a valid instruction.')
                         return False
                     else: #If the first character is not a operator sign and length is 6, input is valid
@@ -255,9 +257,8 @@ class GUI_Subwindows:
         for i in reversed(range(250)): #Finds the last register that was used so we don't write all 100 registers to the file.
             reg_end = i
             if insta.registers[i] != "+000000":
-                reg_end
                 break
-        if reg_end != 0:
+        if reg_end > 0 or (reg_end == 0 and insta.registers[0] != "+000000"):
             for i in range(reg_end):
                 entry_box.insert(END, f"{insta.registers[i]}\n")
             entry_box.insert(END, f"{insta.registers[reg_end]}") #This is to avoid a blank line at the end of the file.
@@ -273,7 +274,7 @@ class GUI_Subwindows:
             if not check_input: #If the input is invalid, the function returns
                 return
             insta.registers[old_values[0]] = formatted_input #If the input is valid, the register is updated
-            self.refresh_table() #Refreshes the table
+            control.refresh_table() #Refreshes the table
             reg_window.destroy() #Closes the subwindow
 
         def validate_input(user_input):
@@ -361,6 +362,7 @@ class Simulator_Controller:
         self.current_addr = ''
         self.error = False
         self.running_state = "idle"
+        self.is_paused = False
      
     def run_cancel_control(self):
             '''Controls behavior of the run/cancel button'''
@@ -439,17 +441,26 @@ class Simulator_Controller:
         elif instruction == "043":
             choice = insta.halt()
             self.halt_console() #Triggers the GUI halt operations
+        
+        if instruction != "043" and not choice and not self.is_paused:
+            user_messages.config(text=insta.error_message) #Displays error message")
+            self.error = True #Informs the GUI halt operations that the program wasn't executed properly
+            self.halt_console() #Triggers the GUI halt operations
 
         return choice
     
     def read_console(self, addr):
         '''Prepares GUI to accept user input.'''
+        if int(addr) > insta.register_size: #Checks if the address is valid.
+            insta.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         self.current_addr = addr #Stores the current address to be used by submit_input function
         console_box.config(state='normal') #Text had to be enabled to be changed.
         console_box.insert(END, f'Enter a positive or negative 6 digit number into memory register {addr}, then press the submit button (ex: +012034 or -043021): ')
         console_box.see(END) #Scrolls the console down
         console_box.config(state='disabled') #Disables the text box after modifications.
         control.show_input() #Enables the user input
+        self.is_paused = True #Pauses the program
         return False #Sets choice to false in order to wait for input submission before moving to next instruction.
 
     def submit_input(self):
@@ -512,6 +523,9 @@ class Simulator_Controller:
     
     def console_write(self, addr):
         '''Writes to the console the value from the register specified.'''
+        if int(addr) > insta.register_size: #Checks if the address is valid.
+            insta.error_message = f"Invalid address: {addr}, the register address must be between 0 and 249."
+            return False
         console_box.config(state='normal') #Text had to be enabled to be changed.
         console_box.insert(END, f"Value from register {addr}: {insta.registers[int(addr)]}\n\n") #Displays the value from the register to console
         console_box.see(END) #Scrolls the console down
