@@ -570,6 +570,9 @@ window.title("Project Blackbox")
 window.geometry("1000x800")
 window.resizable(False, False)
 window.protocol('WM_DELETE_WINDOW', control.terminate) # calls control.terminate() when window is closed
+
+window.iconbitmap('icon.ico') #Sets the window icon
+
 menubar = Menu(window)
 filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Open new window", command=sub_windows.new_window)
