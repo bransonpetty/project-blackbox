@@ -40,7 +40,7 @@ of BasicML scripts.
 
 You can load the instructions buy pressing the "Load Instruction" button as shown bellow or in the "File" menu on the top of the program:
 
-![Load Instruction(Button)](https://github.com/bransonpetty/project-blackbox/blob/develop/readme%20images/Load%20Instructions%20(Button)%20v2.png)
+![Load Instruction(Button)](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Load%20Instructions%20(Button)%20v2.png)
 
 Once you select "Load Instructions", a new window will appear as shown bellow. In this new window you may load the instructions from a file or enter them manually buy entering all of the instructions in the text box in the window. If you decide to open a file, you will be given the change to modify the instructions before loading them to the registers by pressing "Process Entry":
 
@@ -65,7 +65,7 @@ Once the program execution is completed, you will be given the option to rerun t
 
 In the top of the window you will find a "File" menu that can be used to load the instructions or save the register instructions to a txt file:
 
-![File Menu](https://github.com/bransonpetty/project-blackbox/blob/develop/readme%20images/File%20(Menu)%20v2.png)
+![File Menu](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/File%20(Menu)%20v2.png)
 
 Next to the "File" menu you will find the "Execution menu" that can be used to run/cancel/rerun program, reset all the register to 0, and clear the console:
 
@@ -85,7 +85,7 @@ Then you will be able to choose a secondary color (color of the buttons) as show
 
 After selecting both colors, the color scheme of the program will be modified as shown bellow:
 
-![New Style](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Style%20result.png)
+![New Style](https://raw.githubusercontent.com/bransonpetty/project-blackbox/develop/readme%20images/Style%20(Result).png)
 
 ## Tecnical implementation:
 
