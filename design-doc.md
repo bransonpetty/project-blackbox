@@ -148,9 +148,9 @@ is read.
 > - Actor: User
 > - Goal: Write a word from memory to the screen (WRITE)
 > - System: 
->  - Checks validity of address.
->  - Retrieves the word from the register.
->  - Displays word to user.
+>   - Checks validity of address.
+>   - Retrieves the word from the register.
+>   - Displays word to user.
 
 
 - Actor: User
