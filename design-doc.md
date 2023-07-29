@@ -152,6 +152,7 @@ is read.
 >   - Retrieves the word from the register.
 >   - Displays word to user.
 
+---
 
 > - Actor: User
 > - Goal: Read a user-input word into memory (READ)
@@ -160,6 +161,7 @@ is read.
 >   - Checks validity of address to ensure register exists.
 >   - Stores formatted input into desired register.
 
+---
 
 > - Actor: System
 > - Goal: Add a word in memory to the word in the accumulator (ADD)
@@ -169,6 +171,7 @@ is read.
 >   - Check validity of result (verify no overflow occured).
 >   - Store result in accumulator.
 
+---
 
 > - Actor: System
 > - Goal: Convert 4 bit instructions to 6 bit equivalents
@@ -178,6 +181,7 @@ is read.
 >   - Add 0's accordingly.
 >   - Store new instruction.
 
+---
 
 > - Actor: User
 > - Goal: Change color scheme of program
@@ -187,6 +191,7 @@ is read.
 >   - User chooses a secondary color (used for buttons).
 >   - Program updates color scheme to reflect user-choices.
 
+---
 
 > - Actor: System
 > - Goal: Validate user inputs and populate registers.
@@ -201,6 +206,7 @@ is read.
 >   - Program refreshes the register display.
 >   - Program is now ready to be executed.
 
+---
 
 > - Actor: User
 > - Goal: Open a file containing instructions 
@@ -210,6 +216,7 @@ is read.
 >   - User selects proper .txt file and contents are loaded into text-box.
 >   - File is now loaded and ready to be processed.
 
+---
 
 > - Actor: User
 > - Goal: Open two files containing different instructions at once
@@ -221,6 +228,7 @@ is read.
 >   - User selects "open new window" from the file-drowndown menu.
 >   - Repeat steps 1-4 above.
 
+---
 
 > - Actor: System
 > - Goal: Multiply a word from a register by the word in the accumulator.
@@ -230,6 +238,7 @@ is read.
 >   - Validates result of multiplication (no overflow)
 >   - Stores valid result in accumulator
 
+---
 
 > - Actor: System
 > - Goal: Branch to a specific location in memory(register)
