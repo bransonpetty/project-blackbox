@@ -221,6 +221,13 @@ is read.
   - Repeat steps 1-4 above.
 
 ---
+- Actor: System
+- Goal: Multiply a word from a register by the word in the accumulator.
+- System: 
+  - Verifies address validity
+  - Performs multiplication arithmetic.
+  - Validates result of multiplication (no overflow)
+  - Stores valid result in accumulator
 
 - Actor: System
   Goal: Multiply a word from a register by the word in the accumulator.
