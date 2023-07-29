@@ -153,87 +153,87 @@ is read.
 >   - Displays word to user.
 
 
-- Actor: User
-  Goal: Read a user-input word into memory (READ)
-  System: 
-  - Get user-input word
-  - Checks validity of address to ensure register exists.
-  - Stores formatted input into desired register.
+> - Actor: User
+> - Goal: Read a user-input word into memory (READ)
+> - System: 
+>   - Get user-input word
+>   - Checks validity of address to ensure register exists.
+>   - Stores formatted input into desired register.
 
 
-- Actor: System
-  Goal: Add a word in memory to the word in the accumulator (ADD)
-  System: 
-  - Checks validity of address.
-  - Perform addition arithmetic.
-  - Check validity of result (verify no overflow occured).
-  - Store result in accumulator.
+> - Actor: System
+> - Goal: Add a word in memory to the word in the accumulator (ADD)
+> - System: 
+>   - Checks validity of address.
+>   - Perform addition arithmetic.
+>   - Check validity of result (verify no overflow occured).
+>   - Store result in accumulator.
 
 
-- Actor: System
-  Goal: Convert 4 bit instructions to 6 bit equivalents
-  System: 
-  - The previous process provides the conversion function with a list of instructions.
-  - The function checks all instructions in search of 4-bit instructions
-  - Add 0's accordingly.
-  - Store new instruction.
+> - Actor: System
+> - Goal: Convert 4 bit instructions to 6 bit equivalents
+> - System: 
+>   - The previous process provides the conversion function with a list of instructions.
+>   - The function checks all instructions in search of 4-bit instructions
+>   - Add 0's accordingly.
+>   - Store new instruction.
 
 
-- Actor: User
-  Goal: Change color scheme of program
-  System: 
-  - User selects "change color scheme" from the Style dropdown menu to begin the process.
-  - User chooses a primary color (used for background).
-  - User chooses a secondary color (used for buttons).
-  - Program updates color scheme to reflect user-choices.
+> - Actor: User
+> - Goal: Change color scheme of program
+> - System: 
+>   - User selects "change color scheme" from the Style dropdown menu to begin the process.
+>   - User chooses a primary color (used for background).
+>   - User chooses a secondary color (used for buttons).
+>   - Program updates color scheme to reflect user-choices.
 
 
-- Actor: System
-  Goal: Validate user inputs and populate registers.
-  System:  
-  - User presses the Process Entry Button to start the process.
-  - Program gathers all of the user input.
-  - Program validates the entry for size (verifies that it only contains a maximum of 250 instructions)
-  - Program loads every instruction into a list.
-  - Program converts any 4 bit instructions to 6 bit.
-  - Program validates if all the user inputs are valid.
-  - If all inputs are valid, the program load all the instructions to the simulator register.
-  - Program refreshes the register display.
-  - Program is now ready to be executed.
+> - Actor: System
+> - Goal: Validate user inputs and populate registers.
+> - System:  
+>   - User presses the Process Entry Button to start the process.
+>   - Program gathers all of the user input.
+>   - Program validates the entry for size (verifies that it only contains a maximum of 250 instructions)
+>   - Program loads every instruction into a list.
+>   - Program converts any 4 bit instructions to 6 bit.
+>   - Program validates if all the user inputs are valid.
+>   - If all inputs are valid, the program load all the instructions to the simulator register.
+>   - Program refreshes the register display.
+>   - Program is now ready to be executed.
 
 
-- Actor: User
-  Goal: Open a file containing instructions 
-  System: 
-  - User selects "load instructions" on primary page to begin process.
-  - User selects "open file" on secondary tab to open file browser.
-  - User selects proper .txt file and contents are loaded into text-box.
-  - File is now loaded and ready to be processed.
+> - Actor: User
+> - Goal: Open a file containing instructions 
+> - System: 
+>   - User selects "load instructions" on primary page to begin process.
+>   - User selects "open file" on secondary tab to open file browser.
+>   - User selects proper .txt file and contents are loaded into text-box.
+>   - File is now loaded and ready to be processed.
 
 
-- Actor: User
-  Goal: Open two files containing different instructions at once
-  System: 
-  - User selects "load instructions" on primary page to begin process.
-  - User selects "open file" on secondary tab to open file browser.
-  - User selects proper .txt file and contents are loaded into text-box.
-  - File is now loaded and ready to be processed.
-  - User selects "open new window" from the file-drowndown menu.
-  - Repeat steps 1-4 above.
+> - Actor: User
+> - Goal: Open two files containing different instructions at once
+> - System: 
+>   - User selects "load instructions" on primary page to begin process.
+>   - User selects "open file" on secondary tab to open file browser.
+>   - User selects proper .txt file and contents are loaded into text-box.
+>   - File is now loaded and ready to be processed.
+>   - User selects "open new window" from the file-drowndown menu.
+>   - Repeat steps 1-4 above.
 
 
-- Actor: System
-  Goal: Multiply a word from a register by the word in the accumulator.
-  System: 
-  - Verifies address validity
-  - Performs multiplication arithmetic.
-  - Validates result of multiplication (no overflow)
-  - Stores valid result in accumulator
+> - Actor: System
+> - Goal: Multiply a word from a register by the word in the accumulator.
+> - System: 
+>   - Verifies address validity
+>   - Performs multiplication arithmetic.
+>   - Validates result of multiplication (no overflow)
+>   - Stores valid result in accumulator
 
 
-- Actor: System
-  Goal: Branch to a specific location in memory(register)
-  System:
-  - Checks address validity (between 0-249)
-  - Programs current address is set to the specific location chosen in the instruction.
+> - Actor: System
+> - Goal: Branch to a specific location in memory(register)
+> - System:
+>   - Checks address validity (between 0-249)
+>   - Programs current address is set to the specific location chosen in the instruction.
   
