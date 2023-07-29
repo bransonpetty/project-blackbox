@@ -146,8 +146,8 @@ is read.
 
 ## Use Cases: 
 > - Actor: User
-> -Goal: Write a word from memory to the screen (WRITE)
-> -System: 
+> - Goal: Write a word from memory to the screen (WRITE)
+> - System: 
 >  - Checks validity of address.
 >  - Retrieves the word from the register.
 >  - Displays word to user.
